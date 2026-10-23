@@ -1,0 +1,23 @@
+package org.shrek2.research;
+import java.io.*;
+import java.lang.reflect.*;
+import java.nio.file.*;
+public class RomGateTest {
+ static void check(boolean v,String s){if(!v)throw new AssertionError(s);}
+ static void waitGate(RomImportActivity a)throws Exception{Field f=RomImportActivity.class.getDeclaredField("busy");f.setAccessible(true);for(int i=0;i<300;i++){a.runOnUiThread(()->{});if(!(Boolean)f.get(a))return;Thread.sleep(10);}check(false,"ROM worker completed");}
+ static void reject(File dir,InputStream in)throws Exception{boolean rejected=false;try(InputStream src=in){RomStore.importRom(dir,src);}catch(IOException e){rejected=true;}check(rejected,"invalid input rejected");check(RomStore.valid(dir),"invalid import preserves good ROM");for(File p:RomStore.file(dir).getParentFile().listFiles())check(!p.getName().endsWith(".tmp"),"temporary import cleaned");}
+ public static void main(String[]args)throws Exception{
+  File dir=new File(args[0]);dir.mkdirs();System.setProperty("fixture.files",dir.getAbsolutePath());File original=new File(args[1]);check(!RomStore.valid(dir),"fresh installation locked");
+  FrontendActivity locked=new FrontendActivity();locked.onCreate(null);locked.onResume();Field session=SessionActivity.class.getDeclaredField("session");session.setAccessible(true);check((Long)session.get(locked)==0&&locked.starts==1&&locked.finishes==1,"direct gameplay entry redirects without creating native world");locked.onPause();locked.onDestroy();
+  RomImportActivity gate=new RomImportActivity();gate.onCreate(null);waitGate(gate);check(gate.starts==0&&gate.finishes==0,"missing ROM stays on import screen");
+  Method pick=RomImportActivity.class.getDeclaredMethod("pick");pick.setAccessible(true);pick.invoke(gate);check(gate.starts==1,"system picker opened");gate.onActivityResult(100,0,null);check(gate.starts==1,"cancellation does not launch game");
+  File shortFile=new File(dir,"wrong.gba");Files.write(shortFile.toPath(),new byte[]{1,2,3});android.content.Intent bad=new android.content.Intent();bad.data=new android.net.Uri(shortFile.getAbsolutePath());gate.onActivityResult(100,android.app.Activity.RESULT_OK,bad);waitGate(gate);check(gate.starts==1&&!RomStore.valid(dir),"wrong picker file does not launch");
+  android.content.Intent good=new android.content.Intent();good.data=new android.net.Uri(original.getAbsolutePath());gate.onActivityResult(100,android.app.Activity.RESULT_OK,good);waitGate(gate);check(RomStore.valid(dir)&&gate.starts==2&&gate.finishes==1,"valid picker result imports and launches exactly once");
+  RomImportActivity next=new RomImportActivity();next.onCreate(null);waitGate(next);check(next.starts==1&&next.finishes==1,"next launch uses verified private ROM");
+  reject(dir,new ByteArrayInputStream(new byte[0]));reject(dir,new ByteArrayInputStream(new byte[(int)RomStore.SIZE]));reject(dir,new ByteArrayInputStream(new byte[(int)RomStore.SIZE+1]));reject(dir,new InputStream(){int count;public int read()throws IOException{if(count++==100)throw new IOException("provider read failure");return 0;}});
+  File stored=RomStore.file(dir);long stamp=stored.lastModified();try(RandomAccessFile f=new RandomAccessFile(stored,"rw")){f.seek(42);int b=f.read();f.seek(42);f.write(b^1);}stored.setLastModified(stamp);check(!RomStore.valid(dir),"same-size same-mtime modified content rejected by full hash");
+  RomImportActivity altered=new RomImportActivity();altered.onCreate(null);waitGate(altered);check(altered.starts==0,"modified stored ROM blocks launcher");
+  try(InputStream in=new FileInputStream(original)){RomStore.importRom(dir,in);}check(RomStore.valid(dir),"replacement after corruption recovers");android.app.Activity allowed=new android.app.Activity();check(RomAccess.require(allowed)&&allowed.starts==0,"valid file authorizes internal entry");
+  check(stored.delete()&&!RomStore.valid(dir),"deleted ROM blocks later launch");gate.onDestroy();next.onDestroy();altered.onDestroy();System.out.println("Stage100 PASS: mandatory SHA-256, direct entry blocked, SAF import/cancel/wrong file, persistent copy, exact hash not size/mtime, atomic preservation on invalid/read failure, removal/recovery.");
+ }
+}

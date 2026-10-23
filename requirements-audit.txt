@@ -1,0 +1,5 @@
+capstone==5.0.9
+numpy==2.5.4
+pillow==12.3.0
+scipy==1.18.1
+unicorn==2.1.4

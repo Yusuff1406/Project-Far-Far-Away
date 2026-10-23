@@ -1,0 +1,16 @@
+name: Code-only native checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check source-only publication and ROM guard
+        run: python3 tests/verify_source_only.py
+      - name: Compile native host runtime without game data
+        run: bash native/build.sh
+      - name: Explain data-dependent checks
+        run: echo 'Stage105/109/110 and Java/JNI checks require locally extracted original-ROM resources. CI does not fetch or upload a ROM.'

@@ -1,0 +1,32 @@
+package org.shrek2.research;
+import java.lang.reflect.*;
+public class UnifiedActivityTest {
+ static long time=1000000000;static FrontendActivity app;static MenuSurface surface;static OriginalMenu menu;
+ static Object field(String n)throws Exception{Field f=SessionActivity.class.getDeclaredField(n);f.setAccessible(true);return f.get(app);}
+ static Object af(Object o,String n)throws Exception{Field f=o.getClass().getDeclaredField(n);f.setAccessible(true);return f.get(o);}
+ static void check(boolean v,String s){if(!v)throw new AssertionError(s);}
+ static void frames(int n){for(int i=0;i<n;i++){time+=16666667;app.doFrame(time);surface.doFrame(time);}}
+ static void button(int b,boolean down)throws Exception{Method m=SessionActivity.class.getDeclaredMethod("routeButton",int.class,boolean.class,int.class);m.setAccessible(true);m.invoke(app,b,down,-b);}
+ static void press(int b)throws Exception{button(b,true);button(b,false);frames(40);}
+ static void call(String n)throws Exception{Method m=SessionActivity.class.getDeclaredMethod(n);m.setAccessible(true);m.invoke(app);}
+ static android.media.AudioTrack track(String name)throws Exception{return (android.media.AudioTrack)af(af(field("audio"),name),"track");}
+ static int soundCount(int id){int n=0;for(int played:android.media.SoundPool.played)if(played==id)n++;return n;}
+ static void letter(int b)throws Exception{int before=soundCount(63);press(b);check(soundCount(63)==before+1,"initials navigation sound must reach SoundPool once");}
+ static boolean dialogue()throws Exception{Method m=SessionActivity.class.getDeclaredMethod("isDialogueActive",long.class);m.setAccessible(true);return (Boolean)m.invoke(null,(Long)field("session"));}
+ public static void main(String[] args)throws Exception{
+  android.content.res.AssetManager.root=args[0];System.setProperty("fixture.files",args[1]);app=new FrontendActivity();app.onCreate(null);app.onResume();surface=(MenuSurface)field("pauseSurface");menu=(OriginalMenu)field("pauseMenu");long owner=(Long)field("session");check(owner!=0,"session");
+  frames(40);press(1);check(menu.state()[0]==11&&menu.state()[1]==1,"A next boot slide");press(8);check(menu.state()[0]==1,"boot->main");check(((android.view.View)field("controlPanel")).getVisibility()==0,"controller visible in menu");
+  button(4,true);press(8);button(4,false);check(((android.view.View)field("optionsPane")).getVisibility()==0,"Select+Start settings");press(1);check(menu.state()[0]==1&&((android.view.View)field("optionsPane")).getVisibility()==8,"A close settings");
+  press(1);check(menu.state()[0]==2,"slots");press(1);check(menu.state()[0]==13,"initials");press(1);letter(16);press(1);letter(16);press(1);press(1);check(menu.state()[0]==12,"story");check(app.getSharedPreferences("campaign",0).getString("slot_0_name","").equals("ABC"),"ABC persisted");press(8);check(menu.state()[0]==3,"books");press(1);check(menu.state()[0]==4,"chapters");press(1);check(!(Boolean)field("frontendOpen"),"entered");frames(100);
+  check(dialogue(),"intro active");press(64);check(dialogue(),"up must not skip dialogue");press(8);check(!dialogue()&&!(Boolean)field("menuOpen"),"Start skips without pause");
+  press(8);check((Boolean)field("menuOpen")&&menu.state()[0]==5,"pause");press(1);check(!(Boolean)field("menuOpen"),"Resume A");
+  call("openSettings");check(((android.view.View)field("optionsPane")).getVisibility()==0,"settings in game");press(2);check(!(Boolean)field("menuOpen"),"B close settings");
+  track("music").position=1234;track("frontendMusic").position=2345;press(8);press(128);press(1);check(!(Boolean)field("frontendOpen")&&menu.state()[0]==6&&menu.state()[1]==0,"quit confirmation cancel default");press(1);check(menu.state()[0]==5,"cancel quit stays paused");press(1);press(128);press(1);check((Boolean)field("frontendOpen")&&menu.state()[0]==4,"quit level to chapters");check((Long)field("session")==owner,"stable native owner");check(track("music").position==0&&track("frontendMusic").position==0,"level exit resets music");
+  menu.open(9,0);press(1);check(menu.state()[0]==6&&menu.state()[1]==0,"cancel default");press(1);check(app.getSharedPreferences("campaign",0).getString("slot_0_name","").equals("ABC"),"cancel preserves name");press(1);press(128);press(1);check(!app.getSharedPreferences("campaign",0).getBoolean("slot_0_used",false),"erase save");
+  menu.open(8,0);frames(40);track("creditsMusic").position=7654;button(1,true);frames(20);button(1,false);press(2);check(menu.state()[0]==8,"credits ignore B");press(8);check(menu.state()[0]==1,"credits Start exit");check(track("creditsMusic").position==0&&track("frontendMusic").position==0,"credits exit resets music");
+  Method enter=SessionActivity.class.getDeclaredMethod("enterChapter",int.class,int.class);enter.setAccessible(true);
+  for(int sc:new int[]{1,2,13}){enter.invoke(app,sc,0);frames(60);check(dialogue(),"chapter intro active");int id=sc==1?83:86,before=soundCount(id);press(8);check(!dialogue()&&!(Boolean)field("menuOpen"),"chapter Start skip");check(soundCount(id)==before+1,"intro sound reached SoundPool once: "+sc);}
+  check(android.media.AudioManager.requests==0,"must not request exclusive focus");check(app.starts==0&&app.finishes==0&&app.contentSets==1,"one Activity");
+  app.onPause();app.onDestroy();System.out.println("Stage74 real Java+JNI/native with UI/audio stubs: controller menus, ABC save/erase, dialogue Start/up, pause Resume/quit level, settings, credits A/B/Start, audio focus; PASS. Not Android device execution.");
+ }
+}

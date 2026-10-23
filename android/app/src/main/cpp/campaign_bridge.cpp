@@ -1,0 +1,21 @@
+#include <jni.h>
+#include <cstdint>
+#include <vector>
+#include "../../../../../native/campaign_view.h"
+namespace {
+void* ptr(jlong h){return reinterpret_cast<void*>(static_cast<intptr_t>(h));}
+void check(JNIEnv* e,int code){if(code)e->ThrowNew(e->FindClass("java/lang/IllegalStateException"),code==-4?"Could not load or update game resources":"Could not load or update game resources");}
+}
+extern "C" JNIEXPORT jlong JNICALL Java_org_shrek2_research_CampaignBrowser_create(JNIEnv* e,jclass,jstring root){if(!root)return 0;const char* s=e->GetStringUTFChars(root,nullptr);if(!s)return 0;void* p=s2_campaign_create(s);e->ReleaseStringUTFChars(root,s);if(!p)check(e,-2);return static_cast<jlong>(reinterpret_cast<intptr_t>(p));}
+extern "C" JNIEXPORT void JNICALL Java_org_shrek2_research_CampaignBrowser_destroy(JNIEnv*,jclass,jlong h){s2_campaign_destroy(ptr(h));}
+extern "C" JNIEXPORT void JNICALL Java_org_shrek2_research_CampaignBrowser_command(JNIEnv* e,jclass,jlong h,jint command,jint a,jint b){int result=-1;switch(command){case 0:result=s2_campaign_select_scene(ptr(h),a);break;case 1:result=s2_campaign_navigate(ptr(h),a);break;case 2:result=s2_campaign_mode(ptr(h),a);break;case 3:result=s2_campaign_bank(ptr(h),a);break;case 4:result=s2_campaign_animation(ptr(h),a);break;case 5:result=s2_campaign_pan(ptr(h),a,b);break;case 6:result=s2_campaign_option(ptr(h),a,b);break;case 7:result=s2_campaign_step(ptr(h),a);break;case 8:result=s2_campaign_input(ptr(h),a);break;case 9:result=s2_campaign_character(ptr(h),a);break;case 10:{int32_t info[10];result=s2_campaign_walk_info(ptr(h),info);if(!result){result=s2_campaign_mode(ptr(h),0);if(!result)result=s2_campaign_mode(ptr(h),2);if(!result)result=s2_campaign_character(ptr(h),info[0]);}break;}}check(e,result);}
+extern "C" JNIEXPORT jintArray JNICALL Java_org_shrek2_research_CampaignBrowser_info(JNIEnv* e,jclass,jlong h){int32_t data[16];int code=s2_campaign_info(ptr(h),data);if(code){check(e,code);return nullptr;}jintArray out=e->NewIntArray(16);if(out)e->SetIntArrayRegion(out,0,16,data);return out;}
+extern "C" JNIEXPORT jintArray JNICALL Java_org_shrek2_research_CampaignBrowser_pixels(JNIEnv* e,jclass,jlong h,jint width){if(width<240||width>640){check(e,-1);return nullptr;}jintArray out=e->NewIntArray(width*160);if(!out)return nullptr;std::vector<uint32_t> pixels(size_t(width)*160);int code=s2_campaign_render(ptr(h),width,pixels.data(),pixels.size());if(code){check(e,code);return nullptr;}e->SetIntArrayRegion(out,0,width*160,reinterpret_cast<jint*>(pixels.data()));return out;}
+extern "C" JNIEXPORT jintArray JNICALL Java_org_shrek2_research_CampaignBrowser_save(JNIEnv* e,jclass,jlong h){int32_t data[12];int code=s2_campaign_save(ptr(h),data);if(code){check(e,code);return nullptr;}jintArray out=e->NewIntArray(12);if(out)e->SetIntArrayRegion(out,0,12,data);return out;}
+extern "C" JNIEXPORT void JNICALL Java_org_shrek2_research_CampaignBrowser_restore(JNIEnv* e,jclass,jlong h,jintArray state){if(!state||e->GetArrayLength(state)!=12){check(e,-1);return;}int32_t data[12];e->GetIntArrayRegion(state,0,12,data);if(!e->ExceptionCheck())check(e,s2_campaign_restore(ptr(h),data));}
+
+extern "C" JNIEXPORT jintArray JNICALL Java_org_shrek2_research_CampaignBrowser_walkInfo(JNIEnv* e,jclass,jlong h){int32_t data[10];int code=s2_campaign_walk_info(ptr(h),data);if(code){check(e,code);return nullptr;}jintArray out=e->NewIntArray(10);if(out)e->SetIntArrayRegion(out,0,10,data);return out;}
+extern "C" JNIEXPORT jintArray JNICALL Java_org_shrek2_research_CampaignBrowser_saveWalk(JNIEnv* e,jclass,jlong h){int32_t data[100];int code=s2_campaign_walk_save(ptr(h),data);if(code){check(e,code);return nullptr;}jintArray out=e->NewIntArray(100);if(out)e->SetIntArrayRegion(out,0,100,data);return out;}
+extern "C" JNIEXPORT void JNICALL Java_org_shrek2_research_CampaignBrowser_restoreWalk(JNIEnv* e,jclass,jlong h,jintArray state){if(!state||e->GetArrayLength(state)!=100){check(e,-1);return;}int32_t data[100];e->GetIntArrayRegion(state,0,100,data);if(!e->ExceptionCheck())check(e,s2_campaign_walk_restore(ptr(h),data));}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_org_shrek2_research_CampaignBrowser_canWalk(JNIEnv* e,jclass,jlong h){int value=s2_campaign_can_walk(ptr(h));if(value<0)check(e,value);return value>0;}

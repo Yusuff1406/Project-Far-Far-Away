@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:label="Project Far Far Away" android:icon="@drawable/project_icon" android:roundIcon="@drawable/project_icon" android:theme="@style/GameTheme" android:allowBackup="false" android:supportsRtl="true">
+        <activity android:name=".SessionActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".PrototypeActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".MainActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".FrontendActivity" android:exported="false" android:screenOrientation="landscape"/>
+        <activity android:name=".RomImportActivity" android:exported="true" android:screenOrientation="landscape">
+            <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+        </activity>
+    </application>
+</manifest>

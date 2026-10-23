@@ -1,35 +1,58 @@
-# Gradle files
+# Local development tools and build outputs
 .gradle/
-build/
-.kotlin/
-
-# Local configuration file (sdk path, etc)
-local.properties
-
-# Log/OS Files
-*.log
-
-# Android Studio generated files and folders
-captures/
-.externalNativeBuild/
 .cxx/
-*.aab
-*.apk
-output-metadata.json
-
-# IntelliJ
-*.iml
+.externalNativeBuild/
+**/build/
+/dist/
+/sdk/
+/jdk*/
+/local.properties
+**/local.properties
 .idea/
-misc.xml
-deploymentTargetDropDown.xml
-render.experimental.xml
+.vscode/
+*.iml
 
-# Keystore files
-*.jks
+# Signing material: generate a local debug key; never commit release keys
 *.keystore
+*.jks
+*.pem
+*.p12
+.env
+.env.*
+!.env.example
 
-# Google Services (e.g. APIs or Firebase)
-google-services.json
+# ROMs, user saves, installed packages and local test output
+*.gba
+*.gb
+*.gbc
+*.nds
+*.sav
+*.srm
+*.s2qs
+*.apk
+*.aab
+*.apks
+/scratch*/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.log
+.DS_Store
+Thumbs.db
 
-# Android Profiling
-*.hprof
+# Game data must be regenerated locally from the verified ROM
+/android/app/src/main/assets/
+/extracted/
+/sprites/
+/collision/
+/objects/
+/previews/
+/docs/*
+!/docs/BUILD.md
+!/docs/AUDIT.md
+!/docs/audit_summary.json
+
+# Generated historical simulation traces
+/tests/fixtures/
