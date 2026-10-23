@@ -1,5 +1,11 @@
 <p align="center">
-  <img src="docs/images/logo.png" alt="Project Far Far Away Logo" width="200">
+  <img src="docs/images/logo.png" alt="Project Far Far Away" width="300">
+</p>
+
+<h1 align="center">Project Far Far Away</h1>
+
+<p align="center">
+  An AI-assisted native Android port of Shrek 2 (GBA)
 </p>
 
 [GitHub](https://github.com/Yusuff1406/Project-Far-Far-Away) · [GNU GPL v3.0](LICENSE)
