@@ -17,9 +17,11 @@ def main():
     ap.add_argument('--keystore', type=Path, default=ROOT/'android/debug.keystore')
     ap.add_argument('--legacy',action='store_true',help='Experimental Android 5.0+ package, ARMv7 and ARM64, separate app ID.')
     ap.add_argument('--launcher-art',type=Path,help='Optional user-supplied PNG launcher artwork (not published in source).')
+    ap.add_argument('--armv7',action='store_true',help='ARMv7-only Android 5.0+ APK; shares the legacy app ID and saves.')
     a = ap.parse_args()
+    if a.armv7:a.legacy=True
     min_api=21 if a.legacy else 26
-    abis=['armeabi-v7a','arm64-v8a'] if a.legacy else ['arm64-v8a']
+    abis=['armeabi-v7a'] if a.armv7 else ['armeabi-v7a','arm64-v8a']
     package='org.shrek2.research.legacy' if a.legacy else 'org.shrek2.research'
     from prepare_assets import verify_assets
     try: verify_assets()
@@ -38,7 +40,7 @@ def main():
         print('Running:', Path(str(args[0])).name, flush=True)
         return subprocess.run([str(x) for x in args], env=env, check=True,
                               capture_output=capture, text=True)
-    work = ROOT/('android/build/direct-legacy' if a.legacy else 'android/build/direct-debug')
+    work = ROOT/('android/build/direct-armv7' if a.armv7 else 'android/build/direct-legacy' if a.legacy else 'android/build/direct-debug')
     work.mkdir(parents=True, exist_ok=True)
     for name in ['classes','dex']:
         p = work/name
@@ -78,8 +80,8 @@ def main():
     run(bt/'aapt2', 'compile', '--dir', resources, '-o', work/'resources.zip')
     run(bt/'aapt2', 'link', '-o', work/'unsigned.apk', '--manifest', work/'AndroidManifest.xml',
         '-I', platform, work/'resources.zip', '-A', ROOT/'android/app/src/main/assets', '--min-sdk-version', str(min_api),
-        '--target-sdk-version', '35', '--version-code', '112',
-        '--version-name', '1.0.2-android5-experimental' if a.legacy else '1.0.2', '--debug-mode', '-0', 'wav')
+        '--target-sdk-version', '35', '--version-code', '116',
+        '--version-name', '1.0.6-armv7' if a.armv7 else '1.0.6-android5-experimental' if a.legacy else '1.0.6', '--debug-mode', '-0', 'wav')
     with zipfile.ZipFile(work/'unsigned.apk', 'a') as z:
         for dex in sorted((work/'dex').glob('*.dex')): z.write(dex, dex.name)
         for abi,native in natives.items():
@@ -115,11 +117,11 @@ def main():
     staged.replace(output)
     report = {'apk': output.name, 'size': output.stat().st_size,
               'sha256': hashlib.sha256(output.read_bytes()).hexdigest(), 'abis': abis,
-              'min_sdk': min_api, 'target_sdk': 35, 'version_code': 112,
+              'min_sdk': min_api, 'target_sdk': 35, 'version_code': 116,
               'java_sources_compiled': len(sources), 'assets_verified': asset_count,
               'signature_verification': signature.strip(), 'zip_alignment_kib': 16,
               'build_route': 'JDK17 + SDK35 aapt2/d8/zipalign/apksigner + CMake3.22.1/NDK28',
-              'device_tested': False, 'payload_optimization':optimization, 'scope': 'Stage112/v1.0.2: bounded 2-2/final boss camera, instant editor hero relocation, optional original launcher art, separate experimental API21 dual-ABI build. Includes previous fixes and high-refresh support. Lossless smaller APK; exact ROM gate retained. Host and Java/JNI verification; physical Android not tested.'}
+              'device_tested': False, 'payload_optimization':optimization, 'scope': 'Stage116/v1.0.6: ARMv7-only legacy-compatible package, streaming WAV chunk parser and removal of redundant packed sprite copies. Physical Android not tested.'}
     (ROOT/'docs/android_build_validation.json').write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps(report, indent=2))
 

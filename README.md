@@ -8,9 +8,9 @@ Development uses substantial AI assistance, including OpenAI Codex, with iterati
 
 ## Source-only distribution
 
-This public archive contains code, extraction tools and build instructions. It contains **no ROM, original game media or decoded game-resource packages**. The FF app icon is an original vector placeholder. Current update: **v1.0.2 / Stage112**. Fixed visible map edges in chapter 2-2 and the final boss arena. The final boss uses the original 3:2 viewport even when experimental wide arenas are enabled. Moving the active hero in the editor snaps the camera immediately. Release APKs restore the previous launcher artwork; this source-only archive retains the vector placeholder and accepts user-provided artwork through `--launcher-art`.
+This public archive contains code, extraction tools and build instructions. It contains **no ROM, original game media or decoded game-resource packages**. The FF app icon is an original vector placeholder. Current update: **v1.0.6 / Stage116**. Both the main Android 8.0+ APK and the experimental Android 5.0+ APK now include ARMv7 and ARM64, with shared memory/rendering optimizations. These include a streaming WAV parser that avoids whole-file intermediate copies, and smaller resident sprite banks. Mirrored sprite rendering clips once per piece instead of using 64-bit coordinates per pixel. Previous Stage115 behavior is retained: Chapter 2-5 finishes Shrek's original lift to its overhead hold, then fades without a generic victory animation or sound. Gingy's chapter 5-1 also fades directly after its final dialogue. Controls now include an optional **L+R** touch button, disabled by default, and a visual touch-layout editor with drag placement, size adjustment, per-button visibility, Save, Reset and Cancel. Tap the editor header to move its toolbar out of the way. Geometry and visibility edits remain drafts until Save; Android Back cancels. Existing B-capture, zero-coin quota, camera, audio, ROM verification and Android 5 compatibility fixes are retained.
 
-An additional **experimental Android 5.0+** APK uses API 21, ARMv7 + ARM64, and the separate application ID `org.shrek2.research.legacy`. It installs alongside the main Android 8.0+ ARM64 build. Saves and ROM import are separate between these apps. Host tests cover API 21 compatibility branches; no physical Android 5 device has been tested.
+The **ARMv7-only Android 5.0+** APK uses API 21 and the same legacy app ID, signing key and data directory as the previous experimental Android 5 build. It is an update to that app; the main app keeps separate data. A universal **experimental Android 5.0+** build remains available through `--legacy` and uses API 21, ARMv7 + ARM64, and the separate application ID `org.shrek2.research.legacy`. It installs alongside the main Android 8.0+ universal build. Saves and ROM import are separate between these apps. Host tests cover API 21 compatibility branches; no physical Android 5 device has been tested.
 
 Before building the APK or running game-dependent tests, generate resources locally from your own matching original ROM. The tool does not download a ROM or bundle one into the APK. The Android application also retains its original-ROM import check.
 
@@ -22,7 +22,7 @@ Expected ROM: **Shrek 2 (USA, Europe)**. SHA-256:
 
 ## Build
 
-The tested direct build route uses **Linux x86-64, Python 3.12, JDK 17, Android SDK platform 35, Build Tools 35.0.0, NDK 28.0.13004108 and CMake 3.22.1**. Output: ARM64, Android 8.0 / API 26 or newer.
+The tested direct build route uses **Linux x86-64, Python 3.12, JDK 17, Android SDK platform 35, Build Tools 35.0.0, NDK 28.0.13004108 and CMake 3.22.1**. Default output: ARMv7 + ARM64, Android 8.0 / API 26 or newer. Add `--armv7` for the ARMv7-only Android 5.0+ package, or `--legacy` for the universal Android 5 package.
 
 ```bash
 python3 -m venv .venv
@@ -53,6 +53,9 @@ python3 tests/verify_stage109.py
 python3 tests/verify_stage110.py
 python3 tests/verify_stage111.py
 python3 tests/verify_stage112.py
+python3 tests/verify_stage113.py
+python3 tests/verify_stage114.py
+python3 tests/verify_stage115.py
 python3 tests/verify_invisibility111.py /absolute/path/to/original.gba
 python3 tests/verify_unified_activity75.py --jdk /absolute/path/to/jdk-17 --rom /absolute/path/to/original.gba
 ```

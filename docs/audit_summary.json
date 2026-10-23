@@ -1,153 +1,389 @@
 {
-  "release": "1.0.2",
-  "version_code": 112,
-  "stage": 112,
+  "release": "1.0.6",
+  "stage": 116,
+  "version_code": 116,
   "changes": [
-    "Constrain chapter 2-2 scrolling to finite terrain/parallax art.",
-    "Constrain final boss scrolling to finite background art; keep original 3:2 arena.",
-    "Snap active-hero editor relocations without gameplay camera panning or stale interpolation.",
-    "Release APKs restore previous launcher artwork supplied privately at build time.",
-    "Separate experimental Android5/API21 package with ARMv7 and ARM64, backwards-compatible ROM import, audio and display paths."
+    "Common v1.0.6 release: both main API26 and experimental API21 APKs include ARMv7 + ARM64 and share all memory/rendering optimizations; optional ARMv7-only route retained",
+    "Streaming WAV chunk parser reduces intermediate allocations and preserves PCM/loop markers",
+    "Remove redundant packed sprite pixels and clip mirrored sprite pieces before per-pixel work"
   ],
   "tests": {
-    "native_stage112": true,
-    "native_stage111_regression": true,
-    "java_jni_api35": true,
-    "java_jni_api21": true,
-    "main_and_legacy_apk_manifest_signature_elf_jni_icon": true,
-    "physical_android_device_tested": false
+    "source_only_inventory": true,
+    "native_host_build": true,
+    "music_pairs_exact_PCM_and_loops": 21,
+    "music_parser_checks": 33,
+    "synthetic_12MiB_PCM_at_32MiB_heap": "passes candidate; v1.0.5 throws OutOfMemoryError",
+    "sprite_comparison": {
+      "sprite_banks": 33,
+      "render_comparisons": 11316,
+      "mismatches": 0,
+      "packed_pixel_bytes_not_retained_all_banks": 3864096,
+      "scope": "Source-level cached sprite comparison on host, selected first/middle/last sequence frames, all mirror modes, palette overrides and extreme anchors. Total removed buffers is summed across packaged banks, not a measured whole-game RSS or ARMv7 FPS gain."
+    },
+    "native_stage115_endings": true,
+    "native_stage110_regression": true,
+    "armv7_apk_verified": true,
+    "previous_legacy_signer_matches": true,
+    "physical_device_tested": false,
+    "main_and_universal_apks_rebuilt": true,
+    "gradle_build_executed": false,
+    "main_and_legacy_signers_match_v1_0_5": true
   },
   "apks": [
     {
-      "name": "ProjectFarFarAway_v1.0.2.apk",
-      "sha256": "de5d005937ce6a15167fa3604376a0988ec0f3999f153a408b96a2cbfdf681ca",
-      "bytes": 71193189
+      "apk": "ProjectFarFarAway_v1.0.6.apk",
+      "size": 72340226,
+      "sha256": "cadea9fdad014b298c1d9b3447171a9a067a4a6344798f5dde8f1e702d8aa6b9",
+      "abis": [
+        "armeabi-v7a",
+        "arm64-v8a"
+      ],
+      "min_sdk": 26,
+      "target_sdk": 35,
+      "version_code": 116,
+      "java_sources_compiled": 22,
+      "assets_verified": 357,
+      "signature_verification": "Verifies\nVerified using v1 scheme (JAR signing): false\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): true\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1",
+      "zip_alignment_kib": 16,
+      "build_route": "JDK17 + SDK35 aapt2/d8/zipalign/apksigner + CMake3.22.1/NDK28",
+      "device_tested": false,
+      "payload_optimization": {
+        "music_files_compressed": 44,
+        "zip_bytes_before": 88513285,
+        "zip_bytes_after": 72293751
+      },
+      "scope": "Stage116/v1.0.6: ARMv7-only legacy-compatible package, streaming WAV chunk parser and removal of redundant packed sprite copies. Physical Android not tested."
     },
     {
-      "name": "ProjectFarFarAway_v1.0.2_Android5_experimental.apk",
-      "sha256": "4cdca5eb295e59ecc0dd39e8275bfd1df328febf7bda7c3e50aac1943239d062",
-      "bytes": 72356610
+      "apk": "ProjectFarFarAway_v1.0.6_Android5_experimental.apk",
+      "size": 72356610,
+      "sha256": "098408fc972aaa233fd808e0b92f6572ed90109976eddf211cc3f492e4445dba",
+      "abis": [
+        "armeabi-v7a",
+        "arm64-v8a"
+      ],
+      "min_sdk": 21,
+      "target_sdk": 35,
+      "version_code": 116,
+      "java_sources_compiled": 22,
+      "assets_verified": 357,
+      "signature_verification": "Verifies\nVerified using v1 scheme (JAR signing): true\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): true\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1",
+      "zip_alignment_kib": 16,
+      "build_route": "JDK17 + SDK35 aapt2/d8/zipalign/apksigner + CMake3.22.1/NDK28",
+      "device_tested": false,
+      "payload_optimization": {
+        "music_files_compressed": 44,
+        "zip_bytes_before": 88522249,
+        "zip_bytes_after": 72302717
+      },
+      "scope": "Stage116/v1.0.6: ARMv7-only legacy-compatible package, streaming WAV chunk parser and removal of redundant packed sprite copies. Physical Android not tested."
     }
   ],
   "previous_release": {
-    "release": "1.0.1",
-    "version_code": 111,
-    "stage": 111,
-    "base": "Stage110 / clean source audit",
+    "release": "1.0.5",
+    "stage": 115,
+    "version_code": 115,
     "changes": [
-      "Held springs and mushrooms deliver original bounce events instead of acting as synthetic held platforms.",
-      "All physical generic items receive dynamic floor/wall candidates, including keys and carry bonuses.",
-      "Editor hero replacement preserves Q8 feet and X and rebuilds previous body/sweep bounds.",
-      "Editor labels: Rubber duck79, Clover80, Invisibility81, Shield82."
+      "Finish the final Puss B lift with original motion20 and hand markers before fading; retain overhead hold and suppress generic victory animation/audio.",
+      "Fade directly after Gingy chapter5-1 dialogue, preserving both Fairy endings and ordinary-level victory.",
+      "Optional L+R touch button disabled by default; visual drag/resize and visibility editor with draft Save/Reset/Cancel and movable toolbar."
     ],
-    "invisibility": {
-      "behavior_changed": false,
-      "mode": 5,
-      "original_target_predicate": "0800ED9C",
-      "original_incoming_handler": "0800E3A0",
-      "original_thumb_cases": 16,
-      "result": "Excluded from ordinary enemy targeting, but contact/ongoing attack damage still dispatches without an independent immunity deadline. Clover mode4 provides that separate immunity; invisibility does not."
-    },
     "tests": {
-      "editor_hero_replacements": 20,
-      "dynamic_floor_item_types": 12,
-      "held_spring_selected_and_waiting_partner": true,
-      "former_holder_after_release_and_real_jump": true,
-      "native_regressions": [
-        104,
-        105,
-        106,
-        107,
-        109,
-        110,
-        111
-      ],
-      "java_jni_with_android_ui_audio_stubs": true,
-      "source_only_publication": true,
-      "apk_manifest_signature_alignment": true,
-      "signer_matches_stage110": true,
+      "final_Puss_captures_both_facings_tap_hold": 4,
+      "remaining_lift_exact_hand_marker_attachment": true,
+      "fade_steps": 17,
+      "no_generic_victory_sound": true,
+      "Gingy_and_Fairy_final_dialogue_routes": 3,
+      "ordinary_level_victory": true,
+      "previous_stage114_B_captures": 12,
+      "java_jni_api35": true,
+      "java_jni_api21": true,
+      "two_pointer_joint_and_direction": true,
+      "layout_drag_resize_save_reset_cancel": true,
+      "main_and_legacy_apks_verified": true,
+      "signers_match_v1_0_4": true,
       "physical_device_tested": false
     },
-    "apk": {
-      "name": "ProjectFarFarAway_v1.0.1.apk",
-      "sha256": "46d744f4862fcfcf3807e9190a5fd1b7941a3b680cb948bc6f8426265649c413",
-      "bytes": 70930961,
-      "abi": "arm64-v8a",
-      "min_sdk": 26,
-      "assets_verified": 357
-    },
-    "source_distribution": "No game media, ROMs, decoded resource packages, signing keys or binaries. Original 357 asset checksums unchanged.",
-    "baseline_stage110_audit": {
-      "date": "2026-10-23",
-      "input_archive": "Project_Far_Far_Away_GitHub_source-1.zip",
-      "input_sha256": "a6f9bd93579ac332b938ca151b715c5e74483f5cb6342c5893b86e0ffadf4e36",
-      "input_files": 2154,
-      "input_uncompressed_bytes": 246693691,
-      "scope": "Technical source-content and reproducible build audit; no legal clearance or complete playthrough certification.",
-      "original_snapshot": {
-        "native_build": true,
-        "stage109": true,
-        "stage110": true,
-        "java_jni_with_android_ui_audio_stubs": true,
-        "apk_build": true,
-        "apk_verifier": true
+    "apks": [
+      {
+        "name": "ProjectFarFarAway_v1.0.5.apk",
+        "sha256": "b11290f59043da7fbef40d19afe99e9554c4dfee5b014c1d2563f4902dde336d",
+        "bytes": 71193189
       },
-      "clean_source": {
-        "rom_included": false,
-        "game_media_included": false,
-        "decoded_resource_packages_included": false,
-        "original_icon_removed": true,
-        "original_ff_vector_icon": true,
-        "gameplay_cpp_identical_to_input": true,
-        "rom_to_assets_in_fresh_unpack": true,
-        "runtime_asset_count": 357,
-        "all_runtime_assets_sha256_match_input": true,
-        "source_only_ci_build_without_assets": true,
-        "wrong_rom_rejected_before_output": true,
-        "missing_python_dependencies_diagnosed": true,
-        "incomplete_assets_rejected_before_apk_compilation": true,
-        "git_ignore_matches_publication_allowlist_after_extraction": true,
-        "source_tests": true,
-        "native_build": true,
-        "stage105": true,
-        "stage109": true,
-        "stage110": true,
-        "java_jni_with_android_ui_audio_stubs": true,
-        "apk_build": true,
-        "apk_verifier": true,
-        "apk_sha256": "4f8fcf8889322059caeb485a441473897fa5cd4a3471537a235a7c51aaa867a9",
-        "apk_bytes": 70930961,
-        "java_sources_compiled": 21,
-        "abi": "arm64-v8a",
-        "min_sdk": 26,
-        "target_sdk": 35,
-        "version_code": 110,
-        "elf_and_zip_alignment_bytes": 16384
-      },
-      "tools": {
-        "host": "Linux x86-64",
-        "python": "3.12",
-        "jdk": "17.0.17",
-        "android_platform": 35,
-        "build_tools": "35.0.0",
-        "ndk": "28.0.13004108",
-        "cmake": "3.22.1",
-        "python_packages": [
-          "capstone==5.0.9",
-          "numpy==2.5.4",
-          "pillow==12.3.0",
-          "scipy==1.18.1",
-          "unicorn==2.1.4"
-        ]
-      },
-      "not_tested": [
-        "Physical Android APK launch and input/audio behavior",
-        "Full campaign playthrough",
-        "Measured device FPS/latency",
-        "Remote GitHub Actions execution",
-        "Legal clearance of reconstructed code/names/third-party rights"
+      {
+        "name": "ProjectFarFarAway_v1.0.5_Android5_experimental.apk",
+        "sha256": "294132a6edfce389c2e772249de32adc0f26c458f1de11365a64f5f69b3fe5a1",
+        "bytes": 72356610
+      }
+    ],
+    "previous_release": {
+      "release": "1.0.4",
+      "stage": 114,
+      "version_code": 114,
+      "changes": [
+        "Use original Shrek B-attack capture override110E4 and lift entry110C0 for Puss, instead of remapping B to Select/F224.",
+        "Use lift motion20 and frame-marker attachment10640, without generic quarter-distance carry smoothing.",
+        "Route lift release event11 through the actual Puss receiver; preserve recovery and no-damage capture behavior."
       ],
-      "signing": "Local audit debug keys generated; no private signing keys are published. No update compatibility with previously distributed APK signer is claimed."
+      "tests": {
+        "integrated_B_capture_rounds_facings_hold_cases": 12,
+        "source_motion20_and_multiple_frames": true,
+        "per_frame_hand_marker_position": true,
+        "Select_does_not_capture": true,
+        "previous_stage113_regression": true,
+        "original_lift_phase_cases": 4000,
+        "original_attachment_frame_cases": 1240,
+        "original_lift_mismatches": 0,
+        "java_jni_api35": true,
+        "java_jni_api21": true,
+        "main_and_legacy_apks_verified": true,
+        "signers_match_v1_0_3": true,
+        "physical_device_tested": false
+      },
+      "apks": [
+        {
+          "name": "ProjectFarFarAway_v1.0.4.apk",
+          "sha256": "6f04147700a9b3af6f2f2cabde6f9bd946673151a50ec923bf765577a75ad15f",
+          "bytes": 71193189
+        },
+        {
+          "name": "ProjectFarFarAway_v1.0.4_Android5_experimental.apk",
+          "sha256": "76bea1fd35f648c57d01e0393e1628643f5e2039577dd830e4d3705fa7e3be14",
+          "bytes": 72356610
+        }
+      ],
+      "previous_release": {
+        "release": "1.0.3",
+        "stage": 113,
+        "version_code": 113,
+        "changes": [
+          "Fix stale outgoing attack contact in the same frame as automatic Puss release; keep his normal damage and source recovery deadline.",
+          "Use zero collectible-coin quota in chapters 1-5, 2-5, 5-1, 5-5; hide coin HUD and show 0/0 in chapter selection.",
+          "Retain independent timers and minigame scores.",
+          "Migrate old quick-state quotas, preserving editor-added coins."
+        ],
+        "tests": {
+          "real_B_captures_no_immunity": 12,
+          "all_rounds_facings_and_tap_hold": true,
+          "normal_boss_contact_damage_retained": true,
+          "zero_quota_HUDs_and_state_migrations": 4,
+          "chapter_and_bonus_selectors": 30,
+          "original_boss_differential_cases": 23,
+          "original_boss_mismatches": 0,
+          "native_stage108_regression": true,
+          "java_jni_api35": true,
+          "java_jni_api21": true,
+          "main_and_legacy_apk_verified": true,
+          "signers_match_v1_0_2": true,
+          "physical_device_tested": false
+        },
+        "apks": [
+          {
+            "name": "ProjectFarFarAway_v1.0.3.apk",
+            "sha256": "9315cd618a6ec200d933cf136db6a2e9810bb8340d859ce42bfe017f948d462c",
+            "bytes": 71193189
+          },
+          {
+            "name": "ProjectFarFarAway_v1.0.3_Android5_experimental.apk",
+            "sha256": "dcb67868f29616982fe3c184ff1893f6f39c7fe8e587eef9c76ff857340534d3",
+            "bytes": 72356610
+          }
+        ],
+        "previous_release": {
+          "release": "1.0.2",
+          "version_code": 112,
+          "stage": 112,
+          "changes": [
+            "Constrain chapter 2-2 scrolling to finite terrain/parallax art.",
+            "Constrain final boss scrolling to finite background art; keep original 3:2 arena.",
+            "Snap active-hero editor relocations without gameplay camera panning or stale interpolation.",
+            "Release APKs restore previous launcher artwork supplied privately at build time.",
+            "Separate experimental Android5/API21 package with ARMv7 and ARM64, backwards-compatible ROM import, audio and display paths."
+          ],
+          "tests": {
+            "native_stage112": true,
+            "native_stage111_regression": true,
+            "java_jni_api35": true,
+            "java_jni_api21": true,
+            "main_and_legacy_apk_manifest_signature_elf_jni_icon": true,
+            "physical_android_device_tested": false
+          },
+          "apks": [
+            {
+              "name": "ProjectFarFarAway_v1.0.2.apk",
+              "sha256": "de5d005937ce6a15167fa3604376a0988ec0f3999f153a408b96a2cbfdf681ca",
+              "bytes": 71193189
+            },
+            {
+              "name": "ProjectFarFarAway_v1.0.2_Android5_experimental.apk",
+              "sha256": "4cdca5eb295e59ecc0dd39e8275bfd1df328febf7bda7c3e50aac1943239d062",
+              "bytes": 72356610
+            }
+          ],
+          "previous_release": {
+            "release": "1.0.1",
+            "version_code": 111,
+            "stage": 111,
+            "base": "Stage110 / clean source audit",
+            "changes": [
+              "Held springs and mushrooms deliver original bounce events instead of acting as synthetic held platforms.",
+              "All physical generic items receive dynamic floor/wall candidates, including keys and carry bonuses.",
+              "Editor hero replacement preserves Q8 feet and X and rebuilds previous body/sweep bounds.",
+              "Editor labels: Rubber duck79, Clover80, Invisibility81, Shield82."
+            ],
+            "invisibility": {
+              "behavior_changed": false,
+              "mode": 5,
+              "original_target_predicate": "0800ED9C",
+              "original_incoming_handler": "0800E3A0",
+              "original_thumb_cases": 16,
+              "result": "Excluded from ordinary enemy targeting, but contact/ongoing attack damage still dispatches without an independent immunity deadline. Clover mode4 provides that separate immunity; invisibility does not."
+            },
+            "tests": {
+              "editor_hero_replacements": 20,
+              "dynamic_floor_item_types": 12,
+              "held_spring_selected_and_waiting_partner": true,
+              "former_holder_after_release_and_real_jump": true,
+              "native_regressions": [
+                104,
+                105,
+                106,
+                107,
+                109,
+                110,
+                111
+              ],
+              "java_jni_with_android_ui_audio_stubs": true,
+              "source_only_publication": true,
+              "apk_manifest_signature_alignment": true,
+              "signer_matches_stage110": true,
+              "physical_device_tested": false
+            },
+            "apk": {
+              "name": "ProjectFarFarAway_v1.0.1.apk",
+              "sha256": "46d744f4862fcfcf3807e9190a5fd1b7941a3b680cb948bc6f8426265649c413",
+              "bytes": 70930961,
+              "abi": "arm64-v8a",
+              "min_sdk": 26,
+              "assets_verified": 357
+            },
+            "source_distribution": "No game media, ROMs, decoded resource packages, signing keys or binaries. Original 357 asset checksums unchanged.",
+            "baseline_stage110_audit": {
+              "date": "2026-10-23",
+              "input_archive": "Project_Far_Far_Away_GitHub_source-1.zip",
+              "input_sha256": "a6f9bd93579ac332b938ca151b715c5e74483f5cb6342c5893b86e0ffadf4e36",
+              "input_files": 2154,
+              "input_uncompressed_bytes": 246693691,
+              "scope": "Technical source-content and reproducible build audit; no legal clearance or complete playthrough certification.",
+              "original_snapshot": {
+                "native_build": true,
+                "stage109": true,
+                "stage110": true,
+                "java_jni_with_android_ui_audio_stubs": true,
+                "apk_build": true,
+                "apk_verifier": true
+              },
+              "clean_source": {
+                "rom_included": false,
+                "game_media_included": false,
+                "decoded_resource_packages_included": false,
+                "original_icon_removed": true,
+                "original_ff_vector_icon": true,
+                "gameplay_cpp_identical_to_input": true,
+                "rom_to_assets_in_fresh_unpack": true,
+                "runtime_asset_count": 357,
+                "all_runtime_assets_sha256_match_input": true,
+                "source_only_ci_build_without_assets": true,
+                "wrong_rom_rejected_before_output": true,
+                "missing_python_dependencies_diagnosed": true,
+                "incomplete_assets_rejected_before_apk_compilation": true,
+                "git_ignore_matches_publication_allowlist_after_extraction": true,
+                "source_tests": true,
+                "native_build": true,
+                "stage105": true,
+                "stage109": true,
+                "stage110": true,
+                "java_jni_with_android_ui_audio_stubs": true,
+                "apk_build": true,
+                "apk_verifier": true,
+                "apk_sha256": "4f8fcf8889322059caeb485a441473897fa5cd4a3471537a235a7c51aaa867a9",
+                "apk_bytes": 70930961,
+                "java_sources_compiled": 21,
+                "abi": "arm64-v8a",
+                "min_sdk": 26,
+                "target_sdk": 35,
+                "version_code": 110,
+                "elf_and_zip_alignment_bytes": 16384
+              },
+              "tools": {
+                "host": "Linux x86-64",
+                "python": "3.12",
+                "jdk": "17.0.17",
+                "android_platform": 35,
+                "build_tools": "35.0.0",
+                "ndk": "28.0.13004108",
+                "cmake": "3.22.1",
+                "python_packages": [
+                  "capstone==5.0.9",
+                  "numpy==2.5.4",
+                  "pillow==12.3.0",
+                  "scipy==1.18.1",
+                  "unicorn==2.1.4"
+                ]
+              },
+              "not_tested": [
+                "Physical Android APK launch and input/audio behavior",
+                "Full campaign playthrough",
+                "Measured device FPS/latency",
+                "Remote GitHub Actions execution",
+                "Legal clearance of reconstructed code/names/third-party rights"
+              ],
+              "signing": "Local audit debug keys generated; no private signing keys are published. No update compatibility with previously distributed APK signer is claimed."
+            }
+          }
+        }
+      }
     }
+  },
+  "release_variants": {
+    "main": {
+      "application_id": "org.shrek2.research",
+      "min_sdk": 26,
+      "abis": [
+        "armeabi-v7a",
+        "arm64-v8a"
+      ]
+    },
+    "legacy": {
+      "application_id": "org.shrek2.research.legacy",
+      "min_sdk": 21,
+      "abis": [
+        "armeabi-v7a",
+        "arm64-v8a"
+      ]
+    }
+  },
+  "optional_armv7_only_apk": {
+    "apk": "ProjectFarFarAway_v1.0.6_ARMv7.apk",
+    "size": 70660713,
+    "sha256": "944b783f9ba13b72841d4bb10fc85745d5d4367a8dc2ff3e10bc2b3749420d6d",
+    "abis": [
+      "armeabi-v7a"
+    ],
+    "min_sdk": 21,
+    "target_sdk": 35,
+    "version_code": 116,
+    "java_sources_compiled": 22,
+    "assets_verified": 357,
+    "signature_verification": "Verifies\nVerified using v1 scheme (JAR signing): true\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): true\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1",
+    "zip_alignment_kib": 16,
+    "build_route": "JDK17 + SDK35 aapt2/d8/zipalign/apksigner + CMake3.22.1/NDK28",
+    "device_tested": false,
+    "payload_optimization": {
+      "music_files_compressed": 44,
+      "zip_bytes_before": 86828363,
+      "zip_bytes_after": 70608829
+    },
+    "scope": "Stage116/v1.0.6: ARMv7-only legacy-compatible package, streaming WAV chunk parser and removal of redundant packed sprite copies. Physical Android not tested."
   }
 }

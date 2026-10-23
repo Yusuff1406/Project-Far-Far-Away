@@ -11,19 +11,21 @@ def main():
     ap.add_argument('--previous-apk', type=Path)
     ap.add_argument('--legacy',action='store_true')
     ap.add_argument('--launcher-art',type=Path)
+    ap.add_argument('--armv7',action='store_true')
     a = ap.parse_args()
+    if a.armv7:a.legacy=True
     package='org.shrek2.research.legacy' if a.legacy else 'org.shrek2.research'
     min_api=21 if a.legacy else 26
-    abis=['armeabi-v7a','arm64-v8a'] if a.legacy else ['arm64-v8a']
-    work=ROOT/('android/build/direct-legacy' if a.legacy else 'android/build/direct-debug')
+    abis=['armeabi-v7a'] if a.armv7 else ['armeabi-v7a','arm64-v8a']
+    work=ROOT/('android/build/direct-armv7' if a.armv7 else 'android/build/direct-legacy' if a.legacy else 'android/build/direct-debug')
     bt = a.sdk/'build-tools/35.0.0'
     readelf = a.sdk/'ndk/28.0.13004108/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf'
     def run(*args): return subprocess.check_output([str(x) for x in args], text=True)
     badging = run(bt/'aapt', 'dump', 'badging', a.apk)
-    assert f"package: name='{package}' versionCode='112'" in badging
+    assert f"package: name='{package}' versionCode='116'" in badging
     assert f"sdkVersion:'{min_api}'" in badging and "targetSdkVersion:'35'" in badging
     assert "launchable-activity: name='org.shrek2.research.RomImportActivity'" in badging
-    assert all("'"+abi+"'" in badging for abi in abis)
+    assert set(re.findall(r"'([^']+)'",re.search(r'^native-code: (.*)$',badging,re.M).group(1)))==set(abis)
     manifest_xml=run(bt/'aapt2','dump','xmltree',a.apk,'--file','AndroidManifest.xml')
     assert 'RomImportActivity' in manifest_xml
     resources=run(bt/'aapt2','dump','resources',a.apk)

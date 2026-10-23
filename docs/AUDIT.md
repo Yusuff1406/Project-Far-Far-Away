@@ -1,3 +1,7 @@
+# v1.0.6 / Stage116 update
+
+This release adds an ARMv7-only API21 package and reduces music/sprite loading memory. Current results are in `audit_summary.json`; historical sections below describe earlier releases.
+
 # v1.0.1 / Stage111 update
 
 Current changes and test results are recorded in `audit_summary.json`. The following audit describes the earlier Stage110 baseline. Current gameplay changes address held springs, physical item floors and editor hero replacement; the 357 original resource checksums are unchanged.
@@ -27,3 +31,21 @@ The omission list is a technical inventory of original-game content, not a legal
 ## Validation limits
 
 The final fresh-tree rebuild results are recorded in `audit_summary.json`. Native simulations and Java/JNI tests are scoped fixtures. They do not prove a complete campaign playthrough, device frame rate, Android input latency or absence of gameplay defects. The GitHub workflow itself has not been executed remotely as part of this audit.
+
+
+## Stage115 / v1.0.5
+
+The chapter 2-5 final capture retains the original B lift and hand-marker attachment. If the final dialogue interrupts motion20, its remaining frames finish before fading; generic victory state12 and its sound are not entered. Chapter 5-1 joins the existing Fairy scripted endings in fading directly after dialogue. Ordinary level victory remains unchanged.
+
+Controls add an opt-in combined L+R touch button (off by default) and a paused visual layout editor. Dragging moves the actual preview continuously; size and per-button visibility can be changed. Save commits the draft in one preference edit; Reset restores draft defaults; Cancel/Android Back discard the draft. The toolbar can move between top and bottom by tapping its header. Existing individual action assignment and gamepad mapping remain available.
+
+Validation: integrated native final captures for both facings and tap/hold B, exact hand-marker positions during the remaining lift, 17-step black fade without generic victory sound, scripted Gingy/Fairy dialogue endings, and an ordinary-level victory control. Java/JNI host checks exercise optional combined input with a second movement touch, drag/resize drafts, Save/Reset/Cancel, persistence and API21/35 branches. Signed APK structure, original icon pixels and upgrade signer are checked for both packages. These are host tests with explicit Android UI/audio fixtures; no physical Android device or emulator was executed.
+
+
+## Stage116 / v1.0.6
+
+Built and verified the ARMv7-only APK from the supplied v1.0.5 source. Its app ID and signer match the previous experimental Android 5 APK. All 357 resource checksums match. The APK contains 32-bit ARM libraries only; API21 manifest, all JNI exports, ELF/ZIP alignment, original launcher pixels and v1/v2/v3 signatures were checked. No physical Android device or emulator was run, and no ARMv7 FPS improvement is claimed.
+
+The streaming WAV parser passed 21 real intro/loop pairs with every PCM byte and loop marker compared, fragmented/zero-length reads, reordered chunks, odd unknown chunks and malformed inputs. A generated 12 MiB PCM loop loads with a 32 MiB Java heap; the v1.0.5 parser runs out of heap in the same fixture. This isolates parser memory and does not measure AudioTrack or whole-app RAM.
+
+Cached sprite comparisons cover 11,316 cases across 33 packaged banks, all mirror modes, selected sequence frames, palette overrides and extreme anchors, with zero pixel differences against v1.0.5. Removing packed pixel copies eliminates 3,864,096 retained payload bytes summed across all banks; the number simultaneously loaded varies by scene. Mirrored rendering also removes per-pixel 64-bit coordinate work. Host Stage115 ending checks and Stage110 shoulder/input/state regressions were rerun. The subsequent common release also rebuilds and verifies the main API26 APK and experimental API21 APK, each containing ARMv7 and ARM64. Both share these optimizations and versionCode116, and each signer matches its corresponding v1.0.5 APK. No physical device performance was measured.

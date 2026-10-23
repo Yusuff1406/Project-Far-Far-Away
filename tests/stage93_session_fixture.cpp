@@ -14,7 +14,7 @@ int main(){
  // Holding physical B must not send a second detach on the translated Select.
  for(int held:{1,75}){auto*h=create(5);auto&s=*h;quiet(s);auto&cat=s.actors[0];s.tick=150;s.status()[4]=10000;
  for(int capture=1;capture<=3;capture++){s.extra()[3]=0;s.extra()[1]=0;s.contextB=false;s.rawButtons=0;s.book()[4]=0;int32_t idle[3]={1,7,0};assert(!s2_shrek_locomotion_enter(s.player(),s.extra(),s.status(),s.book(),0x158,0,s.tick,s.tick,s.motionTable(),idle,fetch,&s));assert(!s2_generic_message(cat.pose(),8,4,0x08344e2c,s.tick,fetch,&s));cat.subtype[0]=3;cat.subtype[4]=s.tick+1000;std::fill_n(cat.pose()+2,12,0);cat.state[0]=s.state[0];cat.state[1]=s.state[1]+12*256;
- for(int t=0;t<80&&!s.dialogue[64];t++){step(h,t<held?2:0);if(t<45)assert(s.extra()[3]==cat.spawn[0]);}
+ for(int t=0;t<80&&!s.dialogue[64];t++){step(h,t<held?2:0);if(t<45)assert(s.book()[6]==cat.spawn[0]);}
  assert(cat.subtype[6]==capture);if(capture<3)assert(cat.subtype[0]!=4&&s.extra()[3]==0);else assert(cat.subtype[0]==5&&s.dialogue[64]);}
  s2_session_destroy(h);}
  // Joint B is resolved independently, with Shrek either selected or a partner.
