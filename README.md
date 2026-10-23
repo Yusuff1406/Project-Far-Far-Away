@@ -77,7 +77,7 @@ Development uses substantial AI assistance, including OpenAI Codex, with iterati
   <img src="docs/images/gameplay.jpg" width="850">
 </p>
 
-<h2>🛠️ Level Editor</h2>
+<h2> Level Editor</h2>
 
 <p>
   Project Far Far Away includes a built-in level editor
