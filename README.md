@@ -15,39 +15,39 @@
 An unofficial, AI-assisted native Android port and reverse-engineering project for **Shrek 2 (Game Boy Advance)**. The Android app uses Java and a C++ runtime through JNI. This is an ongoing reconstruction, not a claim of a complete matching decompilation.
 
 Development uses substantial AI assistance, including OpenAI Codex, with iterative gameplay comparisons and maintainer feedback. See [audit scope and results](docs/AUDIT.md).
-## ✨ Features
+## Features
 
-### 📱 Native Android Experience
+### Native Android Experience
 - **Native Android Port** — A native reimplementation of Shrek 2 (GBA) without traditional GBA emulation.
 - **Widescreen Support** — Full widescreen support for the main levels. Widescreen support for minigames and boss fights is currently experimental and may be unstable.
 - **High Refresh Rate Support** — Supports refresh rates of up to **240 Hz**.
 - **External Controller Support** — Compatible with third-party gamepads.
 - **Touchscreen Controls** — On-screen controls optimized for Android devices.
 
-### 🛠️ Level Editor & Customization
+### Level Editor & Customization
 - **Full-Featured Level Editor** — Tools for editing and customizing game levels.
 - **Character Customization** — Modify character attributes and gameplay parameters.
 - **Character Switching** — Switch between playable characters during a level.
 - **Gameplay Modifiers** — Freeze timers, freeze enemies, enable invincibility, and adjust other gameplay settings.
 
-### 💾 Saves & Gameplay
+### Saves & Gameplay
 - **Save Support** — Save and continue your progress.
 - **Game Speed Control** — Increase gameplay speed up to **4×**.
 - **Instant Level Unlocking** — Unlock all levels without completing the campaign.
 - **Puss in Boots Double Jump** — An optional quality-of-life gameplay enhancement.
 
-### 🎵 Audio & Quality-of-Life Improvements
+### Audio & Quality-of-Life Improvements
 - **Independent Audio Controls** — Enable or disable music and sound effects separately.
 - **Custom Level Music** — Use music from other levels, including **two unused soundtracks** from the original game.
 - **Additional Quality-of-Life Features** — Various gameplay improvements, customization options, and convenience features.
 
-### 🤖 Development & Open Source
+### Development & Open Source
 - **AI-Assisted Development** — Reverse engineering, native engine development, debugging, and testing assisted by artificial intelligence.
 - **Open-Source Project** — Released under GPL-3.0 to encourage community contributions and further development.
 
 > **Note:** Project Far Far Away is still under active development. Some features may be incomplete or unstable, particularly experimental widescreen support for minigames and boss fights.
 > 
-<h2>📸 Screenshots</h2>
+<h2> Screenshots</h2>
 
 <h3>Original vs. Widescreen</h3>
 
