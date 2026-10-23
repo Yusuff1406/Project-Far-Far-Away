@@ -77,6 +77,41 @@ Development uses substantial AI assistance, including OpenAI Codex, with iterati
   <img src="docs/images/gameplay.jpg" width="850">
 </p>
 
+<h2>🛠️ Level Editor</h2>
+
+<p>
+  Project Far Far Away includes a built-in level editor
+  that allows players to modify game levels directly
+  on Android.
+</p>
+
+<p>
+  The editor provides a widescreen map view, object
+  placement tools, camera navigation, and level
+  customization features.
+</p>
+
+<h3>Editor Interface</h3>
+
+<p align="center">
+  <img src="docs/images/level-editor.jpg"
+       alt="Level editor interface" width="850">
+</p>
+
+<h3>Object Placement</h3>
+
+<p align="center">
+  <img src="docs/images/level-editor-objects.jpg"
+       alt="Level editor object selection" width="850">
+</p>
+
+<h3>Customized Gameplay</h3>
+
+<p align="center">
+  <img src="docs/images/level-editor-gameplay.jpg"
+       alt="Customized gameplay" width="850">
+</p>
+
 ## Source-only distribution
 
 This public archive contains code, extraction tools and build instructions. It contains **no ROM, original game media or decoded game-resource packages**. The FF app icon is an original vector placeholder. The gameplay code remains based on Stage110.
