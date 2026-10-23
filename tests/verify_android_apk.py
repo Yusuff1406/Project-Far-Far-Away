@@ -14,7 +14,7 @@ def main():
     readelf = a.sdk/'ndk/28.0.13004108/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf'
     def run(*args): return subprocess.check_output([str(x) for x in args], text=True)
     badging = run(bt/'aapt', 'dump', 'badging', a.apk)
-    assert "package: name='org.shrek2.research' versionCode='110'" in badging
+    assert "package: name='org.shrek2.research' versionCode='111'" in badging
     assert "sdkVersion:'26'" in badging and "targetSdkVersion:'35'" in badging
     assert "launchable-activity: name='org.shrek2.research.RomImportActivity'" in badging
     assert "native-code: 'arm64-v8a'" in badging

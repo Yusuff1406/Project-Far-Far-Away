@@ -1,3 +1,7 @@
+# v1.0.1 / Stage111 update
+
+Current changes and test results are recorded in `audit_summary.json`. The following audit describes the earlier Stage110 baseline. Current gameplay changes address held springs, physical item floors and editor hero replacement; the 357 original resource checksums are unchanged.
+
 # Source-distribution and build audit
 
 Input: `Project_Far_Far_Away_GitHub_source-1.zip` (2,154 files), SHA-256 `a6f9bd93579ac332b938ca151b715c5e74483f5cb6342c5893b86e0ffadf4e36`.

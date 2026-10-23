@@ -26,7 +26,7 @@ final class MapEditorPanel extends FrameLayout implements android.view.Choreogra
  float zoom=1f;boolean pan=true;private int held=0;private long repeatAt=0;
  private int worldWidth,worldHeight;
  private static final int[] TYPES={13,14,15,16,17,10,18,52,53,54,55,56,57,58,59,60,61,62,76,77,78,79,80,81,82,83,84,85,89};
- private static final String[] NAMES={"Crate","Stump","Crate variant","Mushroom","Spring","Breakable floor","Branch","Witch spawner","Pumpkin","Archer","Axe guard","Axe guard variant","Red enemy","Red enemy variant","Armored knight","Shield knight","Flying pumpkin","Flying pumpkin variant","Key","Apple","Flight fairy","Banana","Shield","Invisibility","Clover","Potion","Flask","Heart jar","Coin"};
+ private static final String[] NAMES={"Crate","Stump","Crate variant","Mushroom","Spring","Breakable floor","Branch","Witch spawner","Pumpkin","Archer","Axe guard","Axe guard variant","Red enemy","Red enemy variant","Armored knight","Shield knight","Flying pumpkin","Flying pumpkin variant","Key","Apple","Flight fairy","Rubber duck","Clover","Invisibility","Shield","Potion","Flask","Heart jar","Coin"};
  MapEditorPanel(Context context,Host host){super(context);this.host=host;setBackgroundColor(0xff181818);int[]a=host.info();worldWidth=a[8];worldHeight=a[9];cameraX=Math.max(0,a[2]-120);cameraY=Math.max(0,a[3]-80);
   map=new MapView(context);FrameLayout.LayoutParams area=new FrameLayout.LayoutParams(-1,-1);area.topMargin=dp(86);area.bottomMargin=dp(52);addView(map,area);
   LinearLayout top=new LinearLayout(context);top.setOrientation(LinearLayout.VERTICAL);LinearLayout row=new LinearLayout(context);top.addView(row);

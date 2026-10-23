@@ -59,8 +59,8 @@ def main():
     run(bt/'aapt2', 'compile', '--dir', ROOT/'android/app/src/main/res', '-o', work/'resources.zip')
     run(bt/'aapt2', 'link', '-o', work/'unsigned.apk', '--manifest', work/'AndroidManifest.xml',
         '-I', platform, work/'resources.zip', '-A', ROOT/'android/app/src/main/assets', '--min-sdk-version', '26',
-        '--target-sdk-version', '35', '--version-code', '110',
-        '--version-name', '1.10-shoulder-controls', '--debug-mode', '-0', 'wav')
+        '--target-sdk-version', '35', '--version-code', '111',
+        '--version-name', '1.0.1', '--debug-mode', '-0', 'wav')
     with zipfile.ZipFile(work/'unsigned.apk', 'a') as z:
         for dex in sorted((work/'dex').glob('*.dex')): z.write(dex, dex.name)
         stripped=work/'stripped';stripped.mkdir(exist_ok=True)
@@ -94,11 +94,11 @@ def main():
     staged.replace(output)
     report = {'apk': output.name, 'size': output.stat().st_size,
               'sha256': hashlib.sha256(output.read_bytes()).hexdigest(), 'abi': 'arm64-v8a',
-              'min_sdk': 26, 'target_sdk': 35, 'version_code': 110,
+              'min_sdk': 26, 'target_sdk': 35, 'version_code': 111,
               'java_sources_compiled': len(sources), 'assets_verified': asset_count,
               'signature_verification': signature.strip(), 'zip_alignment_kib': 16,
               'build_route': 'JDK17 + SDK35 aapt2/d8/zipalign/apksigner + CMake3.22.1/NDK28',
-              'device_tested': False, 'payload_optimization':optimization, 'scope': 'Stage110: single shoulder switch on release; atomic joint-control shoulder chords with no residual release switch. Includes previous fixes and high-refresh support. Lossless smaller APK; exact ROM gate retained. Host and Java/JNI verification; physical Android not tested.'}
+              'device_tested': False, 'payload_optimization':optimization, 'scope': 'Stage111/v1.0.1: held spring bounce, all physical items on dynamic floors, grounded editor hero replacement, correct pickup names; original invisibility damage rules verified. Includes previous fixes and high-refresh support. Lossless smaller APK; exact ROM gate retained. Host and Java/JNI verification; physical Android not tested.'}
     (ROOT/'docs/android_build_validation.json').write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps(report, indent=2))
 

@@ -1,72 +1,121 @@
 {
-  "date": "2026-10-23",
-  "input_archive": "Project_Far_Far_Away_GitHub_source-1.zip",
-  "input_sha256": "a6f9bd93579ac332b938ca151b715c5e74483f5cb6342c5893b86e0ffadf4e36",
-  "input_files": 2154,
-  "input_uncompressed_bytes": 246693691,
-  "scope": "Technical source-content and reproducible build audit; no legal clearance or complete playthrough certification.",
-  "original_snapshot": {
-    "native_build": true,
-    "stage109": true,
-    "stage110": true,
-    "java_jni_with_android_ui_audio_stubs": true,
-    "apk_build": true,
-    "apk_verifier": true
+  "release": "1.0.1",
+  "version_code": 111,
+  "stage": 111,
+  "base": "Stage110 / clean source audit",
+  "changes": [
+    "Held springs and mushrooms deliver original bounce events instead of acting as synthetic held platforms.",
+    "All physical generic items receive dynamic floor/wall candidates, including keys and carry bonuses.",
+    "Editor hero replacement preserves Q8 feet and X and rebuilds previous body/sweep bounds.",
+    "Editor labels: Rubber duck79, Clover80, Invisibility81, Shield82."
+  ],
+  "invisibility": {
+    "behavior_changed": false,
+    "mode": 5,
+    "original_target_predicate": "0800ED9C",
+    "original_incoming_handler": "0800E3A0",
+    "original_thumb_cases": 16,
+    "result": "Excluded from ordinary enemy targeting, but contact/ongoing attack damage still dispatches without an independent immunity deadline. Clover mode4 provides that separate immunity; invisibility does not."
   },
-  "clean_source": {
-    "rom_included": false,
-    "game_media_included": false,
-    "decoded_resource_packages_included": false,
-    "original_icon_removed": true,
-    "original_ff_vector_icon": true,
-    "gameplay_cpp_identical_to_input": true,
-    "rom_to_assets_in_fresh_unpack": true,
-    "runtime_asset_count": 357,
-    "all_runtime_assets_sha256_match_input": true,
-    "source_only_ci_build_without_assets": true,
-    "wrong_rom_rejected_before_output": true,
-    "missing_python_dependencies_diagnosed": true,
-    "incomplete_assets_rejected_before_apk_compilation": true,
-    "git_ignore_matches_publication_allowlist_after_extraction": true,
-    "source_tests": true,
-    "native_build": true,
-    "stage105": true,
-    "stage109": true,
-    "stage110": true,
+  "tests": {
+    "editor_hero_replacements": 20,
+    "dynamic_floor_item_types": 12,
+    "held_spring_selected_and_waiting_partner": true,
+    "former_holder_after_release_and_real_jump": true,
+    "native_regressions": [
+      104,
+      105,
+      106,
+      107,
+      109,
+      110,
+      111
+    ],
     "java_jni_with_android_ui_audio_stubs": true,
-    "apk_build": true,
-    "apk_verifier": true,
-    "apk_sha256": "4f8fcf8889322059caeb485a441473897fa5cd4a3471537a235a7c51aaa867a9",
-    "apk_bytes": 70930961,
-    "java_sources_compiled": 21,
+    "source_only_publication": true,
+    "apk_manifest_signature_alignment": true,
+    "signer_matches_stage110": true,
+    "physical_device_tested": false
+  },
+  "apk": {
+    "name": "ProjectFarFarAway_v1.0.1.apk",
+    "sha256": "46d744f4862fcfcf3807e9190a5fd1b7941a3b680cb948bc6f8426265649c413",
+    "bytes": 70930961,
     "abi": "arm64-v8a",
     "min_sdk": 26,
-    "target_sdk": 35,
-    "version_code": 110,
-    "elf_and_zip_alignment_bytes": 16384
+    "assets_verified": 357
   },
-  "tools": {
-    "host": "Linux x86-64",
-    "python": "3.12",
-    "jdk": "17.0.17",
-    "android_platform": 35,
-    "build_tools": "35.0.0",
-    "ndk": "28.0.13004108",
-    "cmake": "3.22.1",
-    "python_packages": [
-      "capstone==5.0.9",
-      "numpy==2.5.4",
-      "pillow==12.3.0",
-      "scipy==1.18.1",
-      "unicorn==2.1.4"
-    ]
-  },
-  "not_tested": [
-    "Physical Android APK launch and input/audio behavior",
-    "Full campaign playthrough",
-    "Measured device FPS/latency",
-    "Remote GitHub Actions execution",
-    "Legal clearance of reconstructed code/names/third-party rights"
-  ],
-  "signing": "Local audit debug keys generated; no private signing keys are published. No update compatibility with previously distributed APK signer is claimed."
+  "source_distribution": "No game media, ROMs, decoded resource packages, signing keys or binaries. Original 357 asset checksums unchanged.",
+  "baseline_stage110_audit": {
+    "date": "2026-10-23",
+    "input_archive": "Project_Far_Far_Away_GitHub_source-1.zip",
+    "input_sha256": "a6f9bd93579ac332b938ca151b715c5e74483f5cb6342c5893b86e0ffadf4e36",
+    "input_files": 2154,
+    "input_uncompressed_bytes": 246693691,
+    "scope": "Technical source-content and reproducible build audit; no legal clearance or complete playthrough certification.",
+    "original_snapshot": {
+      "native_build": true,
+      "stage109": true,
+      "stage110": true,
+      "java_jni_with_android_ui_audio_stubs": true,
+      "apk_build": true,
+      "apk_verifier": true
+    },
+    "clean_source": {
+      "rom_included": false,
+      "game_media_included": false,
+      "decoded_resource_packages_included": false,
+      "original_icon_removed": true,
+      "original_ff_vector_icon": true,
+      "gameplay_cpp_identical_to_input": true,
+      "rom_to_assets_in_fresh_unpack": true,
+      "runtime_asset_count": 357,
+      "all_runtime_assets_sha256_match_input": true,
+      "source_only_ci_build_without_assets": true,
+      "wrong_rom_rejected_before_output": true,
+      "missing_python_dependencies_diagnosed": true,
+      "incomplete_assets_rejected_before_apk_compilation": true,
+      "git_ignore_matches_publication_allowlist_after_extraction": true,
+      "source_tests": true,
+      "native_build": true,
+      "stage105": true,
+      "stage109": true,
+      "stage110": true,
+      "java_jni_with_android_ui_audio_stubs": true,
+      "apk_build": true,
+      "apk_verifier": true,
+      "apk_sha256": "4f8fcf8889322059caeb485a441473897fa5cd4a3471537a235a7c51aaa867a9",
+      "apk_bytes": 70930961,
+      "java_sources_compiled": 21,
+      "abi": "arm64-v8a",
+      "min_sdk": 26,
+      "target_sdk": 35,
+      "version_code": 110,
+      "elf_and_zip_alignment_bytes": 16384
+    },
+    "tools": {
+      "host": "Linux x86-64",
+      "python": "3.12",
+      "jdk": "17.0.17",
+      "android_platform": 35,
+      "build_tools": "35.0.0",
+      "ndk": "28.0.13004108",
+      "cmake": "3.22.1",
+      "python_packages": [
+        "capstone==5.0.9",
+        "numpy==2.5.4",
+        "pillow==12.3.0",
+        "scipy==1.18.1",
+        "unicorn==2.1.4"
+      ]
+    },
+    "not_tested": [
+      "Physical Android APK launch and input/audio behavior",
+      "Full campaign playthrough",
+      "Measured device FPS/latency",
+      "Remote GitHub Actions execution",
+      "Legal clearance of reconstructed code/names/third-party rights"
+    ],
+    "signing": "Local audit debug keys generated; no private signing keys are published. No update compatibility with previously distributed APK signer is claimed."
+  }
 }

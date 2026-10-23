@@ -8,7 +8,7 @@ Development uses substantial AI assistance, including OpenAI Codex, with iterati
 
 ## Source-only distribution
 
-This public archive contains code, extraction tools and build instructions. It contains **no ROM, original game media or decoded game-resource packages**. The FF app icon is an original vector placeholder. The gameplay code remains based on Stage110.
+This public archive contains code, extraction tools and build instructions. It contains **no ROM, original game media or decoded game-resource packages**. The FF app icon is an original vector placeholder. Current update: **v1.0.1 / Stage111**, based on Stage110. Held springs now bounce partners instead of grounding them; physical pickups use breakable-floor collision; editor character replacement preserves foot position and resets its collision sweep. Pickup labels correctly identify Rubber duck, Clover and Shield. Original invisibility excludes enemy targeting, but does not provide contact-damage immunity.
 
 Before building the APK or running game-dependent tests, generate resources locally from your own matching original ROM. The tool does not download a ROM or bundle one into the APK. The Android application also retains its original-ROM import check.
 
@@ -49,6 +49,8 @@ After resource preparation:
 python3 tests/verify_stage105.py
 python3 tests/verify_stage109.py
 python3 tests/verify_stage110.py
+python3 tests/verify_stage111.py
+python3 tests/verify_invisibility111.py /absolute/path/to/original.gba
 python3 tests/verify_unified_activity75.py --jdk /absolute/path/to/jdk-17 --rom /absolute/path/to/original.gba
 ```
 
