@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="docs/images/logo.png" alt="Project Far Far Away" width="300">
+  <img src="docs/images/logo.png" alt="Project Far Far Away" width="200">
 </p>
 
 <h1 align="center">Project Far Far Away</h1>
