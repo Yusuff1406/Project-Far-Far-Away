@@ -1,4 +1,6 @@
-# Project Far Far Away
+<p align="center">
+  <img src="docs/images/logo.png" alt="Project Far Far Away Logo" width="200">
+</p>
 
 [GitHub](https://github.com/Yusuff1406/Project-Far-Far-Away) · [GNU GPL v3.0](LICENSE)
 
