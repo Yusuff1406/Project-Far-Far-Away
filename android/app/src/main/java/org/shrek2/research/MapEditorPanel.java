@@ -26,7 +26,7 @@ final class MapEditorPanel extends FrameLayout implements android.view.Choreogra
  float zoom=1f;boolean pan=true;private int held=0;private long repeatAt=0;
  private int worldWidth,worldHeight;
  private static final int[] TYPES={13,14,15,16,17,10,18,52,53,54,55,56,57,58,59,60,61,62,76,77,78,79,80,81,82,83,84,85,89};
- private static final String[] NAMES={"Crate","Stump","Crate variant","Mushroom","Spring","Breakable floor","Branch","Witch spawner","Pumpkin","Archer","Axe guard","Axe guard variant","Red enemy","Red enemy variant","Armored knight","Shield knight","Flying pumpkin","Flying pumpkin variant","Key","Apple","Flight fairy","Rubber duck","Clover","Invisibility","Shield","Potion","Flask","Heart jar","Coin"};
+ private static final String[] NAMES={"Crate","Stump","Crate variant","Mushroom","Spring","Breakable floor","Branch","Witch spawner","Pumpkin","Archer","Axe guard","Axe guard variant","Red enemy","Red enemy variant","Armored knight","Shield knight","Flying pumpkin","Flying pumpkin variant","Key","Apple","Flight fairy","Rubber duck","Shield","Invisibility","Clover","Potion","Flask","Heart jar","Coin"};
  MapEditorPanel(Context context,Host host){super(context);this.host=host;setBackgroundColor(0xff181818);int[]a=host.info();worldWidth=a[8];worldHeight=a[9];cameraX=Math.max(0,a[2]-120);cameraY=Math.max(0,a[3]-80);
   map=new MapView(context);FrameLayout.LayoutParams area=new FrameLayout.LayoutParams(-1,-1);area.topMargin=dp(86);area.bottomMargin=dp(52);addView(map,area);
   LinearLayout top=new LinearLayout(context);top.setOrientation(LinearLayout.VERTICAL);LinearLayout row=new LinearLayout(context);top.addView(row);
@@ -42,7 +42,8 @@ final class MapEditorPanel extends FrameLayout implements android.view.Choreogra
  private String name(int type){if(type>=3&&type<=7)return new String[]{"Shrek","Puss in Boots","Gingy","Donkey","Human Shrek"}[type-3];for(int i=0;i<TYPES.length;i++)if(TYPES[i]==type)return NAMES[i];return "Object "+type;}
  private int at(int id){for(int i=0;i<entities.length;i+=6)if(entities[i]==id)return i;return -1;}
  private Bitmap thumbnail(int type){Bitmap b=thumbnails.get(type);if(b==null){int[] pixels=host.thumbnail(type);b=Bitmap.createBitmap(64,64,Bitmap.Config.ARGB_8888);b.setPixels(pixels,0,64,0,0,64,64);thumbnails.put(type,b);}return b;}
- private void palette(String title,int[] types,String[] labels,java.util.function.IntConsumer choose){
+ private interface Choose { void accept(int value); }
+ private void palette(String title,int[] types,String[] labels,Choose choose){
   android.widget.ScrollView scroll=new android.widget.ScrollView(getContext());LinearLayout grid=new LinearLayout(getContext());grid.setOrientation(LinearLayout.VERTICAL);grid.setPadding(dp(6),dp(6),dp(6),dp(6));scroll.addView(grid);
   final android.app.AlertDialog[] dialog=new android.app.AlertDialog[1];
   for(int base=0;base<types.length;base+=3){LinearLayout row=new LinearLayout(getContext());grid.addView(row);for(int column=0;column<3;column++){int i=base+column;LinearLayout card=new LinearLayout(getContext());card.setOrientation(LinearLayout.VERTICAL);card.setPadding(dp(4),dp(4),dp(4),dp(4));card.setBackgroundColor(0xff29343b);LinearLayout.LayoutParams cell=new LinearLayout.LayoutParams(0,dp(108),1f);cell.setMargins(dp(3),dp(3),dp(3),dp(3));row.addView(card,cell);if(i>=types.length){card.setVisibility(View.INVISIBLE);continue;}

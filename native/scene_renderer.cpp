@@ -112,7 +112,7 @@ int main(int argc,char** argv){
 
 extern "C" int s2_render_file_foreground(const char* path,int cx,int cy,int w,int h,uint8_t* rgba,size_t capacity){try{if(!path||!rgba||w<=0||h<=0||uint64_t(w)*h*4>capacity)return -1;auto s=load_scene(path);auto out=render(s,cx,cy,w,h,-1,-1,0);std::copy(out.begin(),out.end(),rgba);return 0;}catch(...){return -2;}}
 
-extern "C" int s2_scene_camera_right(void* h,int width){if(!h||width<1)return 0;auto& s=*static_cast<Scene*>(h);int right=std::max(0,int(s.w)-width);for(auto& l:s.layers)if(l.slot!=0&&l.sx)right=std::min(right,std::max(0,(int(l.w*8)-width)*256/int(l.sx)));return right;}
+extern "C" int s2_scene_camera_right(void* h,int width){if(!h||width<1)return 0;auto& s=*static_cast<Scene*>(h);int right=std::max(0,int(s.w)-width);for(auto& l:s.layers)if((l.slot!=0||width<=240)&&l.sx)right=std::min(right,std::max(0,(int(l.w*8)-width)*256/int(l.sx)));return right;}
 extern "C" int s2_scene_render_front(void* handle,int cx,int cy,int w,int h,uint8_t* rgba,size_t capacity){try{if(!handle||!rgba||w<=0||h<=0||uint64_t(w)*h*4>capacity)return -1;auto out=render(*static_cast<Scene*>(handle),cx,cy,w,h,-1,-1,0);std::copy(out.begin(),out.end(),rgba);return 0;}catch(...){return -2;}}
 
 // Limit scrolling to finite map artwork, including the laboratory's last row.

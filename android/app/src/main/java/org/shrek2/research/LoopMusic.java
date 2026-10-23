@@ -14,7 +14,7 @@ final class LoopMusic implements AutoCloseable {
   loopStart=music.loopStartFrames;loopEnd=music.loopEndFrames;
   AudioTrack candidate=null;
   try {
-   candidate=new AudioTrack.Builder().setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()).setAudioFormat(new AudioFormat.Builder().setEncoding(AudioFormat.ENCODING_PCM_16BIT).setChannelMask(AudioFormat.CHANNEL_OUT_MONO).setSampleRate(music.sampleRate).build()).setTransferMode(AudioTrack.MODE_STATIC).setBufferSizeInBytes(music.pcm.length).build();
+   candidate=android.os.Build.VERSION.SDK_INT<23?new AudioTrack(android.media.AudioManager.STREAM_MUSIC,music.sampleRate,AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT,music.pcm.length,AudioTrack.MODE_STATIC):new AudioTrack.Builder().setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()).setAudioFormat(new AudioFormat.Builder().setEncoding(AudioFormat.ENCODING_PCM_16BIT).setChannelMask(AudioFormat.CHANNEL_OUT_MONO).setSampleRate(music.sampleRate).build()).setTransferMode(AudioTrack.MODE_STATIC).setBufferSizeInBytes(music.pcm.length).build();
    if(candidate.getState()!=AudioTrack.STATE_INITIALIZED&&candidate.getState()!=AudioTrack.STATE_NO_STATIC_DATA)throw new IOException("Could not load or update resources");
    short[] samples=new short[music.pcm.length/2];for(int i=0;i<samples.length;i++)samples[i]=(short)((music.pcm[i*2]&255)|((music.pcm[i*2+1]&255)<<8));
    if(candidate.write(samples,0,samples.length)!=samples.length)throw new IOException("Could not load or update resources");
@@ -26,7 +26,7 @@ final class LoopMusic implements AutoCloseable {
  void play(){if(!closed&&track.getPlayState()!=AudioTrack.PLAYSTATE_PLAYING)track.play();}
  void pause(){if(!closed&&track.getPlayState()==AudioTrack.PLAYSTATE_PLAYING)track.pause();}
  void reset(){if(closed)return;track.stop();if(track.reloadStaticData()!=AudioTrack.SUCCESS||track.setLoopPoints(loopStart,loopEnd,-1)!=AudioTrack.SUCCESS)throw new IllegalStateException("Could not load or update resources");}
- int position(){if(closed)return 0;long p=Integer.toUnsignedLong(track.getPlaybackHeadPosition());return p<loopEnd?(int)p:loopStart+(int)((p-loopStart)%(loopEnd-loopStart));}
+ int position(){if(closed)return 0;long p=(track.getPlaybackHeadPosition()&0xffffffffL);return p<loopEnd?(int)p:loopStart+(int)((p-loopStart)%(loopEnd-loopStart));}
  void seek(int frame){if(closed)return;if(frame<0)throw new IllegalArgumentException("Invalid music position");int p=frame<loopEnd?frame:loopStart+(frame-loopStart)%(loopEnd-loopStart);track.stop();if(track.setPlaybackHeadPosition(p)!=AudioTrack.SUCCESS||track.setLoopPoints(loopStart,loopEnd,-1)!=AudioTrack.SUCCESS)throw new IllegalStateException("Could not restore music position");}
  @Override public void close(){if(closed)return;pause();closed=true;track.release();}
 }

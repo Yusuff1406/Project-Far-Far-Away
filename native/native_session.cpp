@@ -327,7 +327,7 @@ static void cameraFocusTarget(const OwnedSession& s,int32_t* target){
  if(sharedCamera(s))for(size_t i=0;i<s.party.size();i++)if(int(i)!=s.partyIndex){auto* p=s.party[i].state;x+=p[0];feet+=int64_t(p[1])+p[31]*128;++n;}
  target[0]=int32_t(x/n);target[1]=int32_t(feet/n)-40*256;
 }
-static int cameraRight(const OwnedSession& s){return s.sceneId==1&&s.decodedScene?std::min(std::max(0,s.worldWidth-s.width),s2_scene_camera_right(s.decodedScene.get(),s.width)):std::max(0,s.worldWidth-s.width);}
+static int cameraRight(const OwnedSession& s){return (s.sceneId==1||s.sceneId==14||s.sceneId==16)&&s.decodedScene?std::min(std::max(0,s.worldWidth-s.width),s2_scene_camera_right(s.decodedScene.get(),s.width)):std::max(0,s.worldWidth-s.width);}
 static int cameraBottom(const OwnedSession& s){int bottom=std::max(0,s.worldHeight-160-((s.sceneId==8||s.sceneId==23)?8:0));return (s.sceneId==21||s.sceneId==11)&&s.decodedScene?std::min(bottom,s2_scene_camera_bottom(s.decodedScene.get(),160)):bottom;}
 static int timedSeconds(int scene){return scene==21?115:scene==22?120:scene==20?30:scene==16?45:0;}
 static void projectPartyCamera(OwnedSession& s){s.cameraX=std::clamp((s.cameraFocus[0]>>8)-s.width/2,0,cameraRight(s));s.cameraY=std::clamp((s.cameraFocus[1]>>8)-80,0,cameraBottom(s));}

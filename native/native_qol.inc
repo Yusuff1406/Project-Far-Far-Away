@@ -27,14 +27,20 @@ extern "C" int s2_session_load_state(void*h,const char*p){if(!h||!p)return -1;tr
 static OwnedSession& qWorld(void*h){auto&s=*static_cast<OwnedSession*>(h);return s.mini?*s.mini:s;}
 extern "C" int s2_session_debug_info(void*h,int32_t*out){if(!h||!out)return -1;auto&s=qWorld(h);int32_t v[]={s.sceneId,s.playerType,s.state[0]/256,s.state[1]/256,s.state[89],s.coins,int(s.actors.size()),s.tick,s.worldWidth,s.worldHeight,s.heroSpeed[s.playerType-3],s.heroJump[s.playerType-3],s.trainerFlags,s.heroPower[s.playerType-3]};std::copy_n(v,14,out);return 0;}
 extern "C" int s2_session_debug_actors(void*h,int32_t*out,size_t max){if(!h)return -1;int n=0;for(auto&a:qWorld(h).actors)if(!(a.state[40]&1)){if(out&&size_t(n)<max){int32_t v[]={a.spawn[0],a.spawn[1],a.state[0]/256,a.state[1]/256};std::copy_n(v,4,out+4*n);}n++;}return n;}
+static void qSnapCamera(OwnedSession&s){
+ s.cameraBlend=0;cameraFocusTarget(s,s.cameraFocus);projectPartyCamera(s);
+ // Cancel source camera effects and previous-frame interpolation after teleport.
+ std::fill_n(s.effects,9,0);s.cameraReady=s.historyReady=s.displayCaptured=false;
+ s.lastRenderX=s.previousRenderX=s.cameraX;s.lastRenderY=s.previousRenderY=s.cameraY;
+}
 static void qPlace(int32_t*p,int x,int y){p[0]=p[36]=x*256;p[1]=p[37]=y*256;p[32]=p[0]-p[30]*128;p[33]=p[1]-p[31]*128;p[5]=p[11]=0;}
 extern "C" int s2_session_debug_edit(void*h,int cmd,int a,int b,int c){if(!h)return -1;auto&s=qWorld(h);
- if(cmd==10){if(a<0||a>=int(s.party.size())||b<0||b>=s.worldWidth||c<0||c>=s.worldHeight)return -1;int32_t*p=a==s.partyIndex?s.state:s.party[a].state;if(p[83]||p[102])return -1;qPlace(p,b,c);return 0;}
+ if(cmd==10){if(a<0||a>=int(s.party.size())||b<0||b>=s.worldWidth||c<0||c>=s.worldHeight)return -1;int32_t*p=a==s.partyIndex?s.state:s.party[a].state;if(p[83]||p[102])return -1;qPlace(p,b,c);if(a==s.partyIndex)qSnapCamera(s);return 0;}
  if(cmd==9){if(a<3||a>7||b< -1||b>3)return -1;s.heroPower[a-3]=b;return 0;}if(cmd==6){if(a<0||a>7)return -1;s.trainerFlags=a;return 0;}
  if(cmd==7){if(a<3||a>7||b<25||b>300||c<25||c>200)return -1;s.heroSpeed[a-3]=b;s.heroJump[a-3]=c;return 0;}
  if(cmd==1){int max=s.playerType==3||s.playerType==7?6:s.playerType==5?3:4;if(a<1||a>max)return -1;s.state[89]=a;return 0;}
  if(cmd==2){if(a<0||a>999999)return -1;s.coins=a;return 0;}
- if(cmd==0){if(a<0||a>=s.worldWidth||b<0||b>=s.worldHeight||s.extra()[1]||s.book()[6])return -1;qPlace(s.state,a,b);s.cameraBlend=0;cameraFocusTarget(s,s.cameraFocus);projectPartyCamera(s);return 0;}
+ if(cmd==0){if(a<0||a>=s.worldWidth||b<0||b>=s.worldHeight||s.extra()[1]||s.book()[6])return -1;qPlace(s.state,a,b);qSnapCamera(s);return 0;}
  if(cmd==3){if(a<3||a>7||s.dialogue[64]||s.extra()[1]||s.book()[6]||s.levelEnding)return -1;if(a==s.playerType)return 0;for(size_t i=0;i<s.party.size();i++)if(s.party[i].type==a){s.partyHeld=0;s.jointControl=false;for(size_t attempt=0;attempt<s.party.size()&&s.playerType!=a;attempt++){switchPartner(s,256);switchPartner(s,0);}return s.playerType==a?0:-1;}const int32_t oldX=s.state[0],oldFoot=s.state[1]+s.state[31]*128;int32_t state[320]={},xy[]={s.state[0],s.state[1]},header[6];int e=s2_generic_runtime_init(xy,s.state[18],heroAnimation(a),s.tick,fetch,&s,state);if(e||!fetch(heroHealth(a),header,6,&s))return -2;e=s2_shrek_reactions_init(state,state+80,state+88,(uint32_t(header[5])>>8)&255,s.tick);if(e)return e;state[40]|=6;if(a==6||a==7)state[90]=1;const int32_t event[]={1,7,0};e=s2_shrek_locomotion_enter(state,state+80,state+88,state+96,0x158,0,s.tick,s.tick,heroTable(a),event,fetch,&s);if(e)return e;
  // Preserve feet and rebase the sweep after the constructor changes body size.
  state[0]=state[36]=oldX;state[1]=state[37]=oldFoot-state[31]*128;state[32]=state[0]-state[30]*128;state[33]=state[1]-state[31]*128;state[34]=state[30]*256;state[35]=state[31]*256;state[60]=state[61]=0;

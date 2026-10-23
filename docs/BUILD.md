@@ -50,3 +50,19 @@ The builder generates `android/debug.keystore` locally if absent. Never commit a
 Run the source-only test before resource preparation, then native build and data-dependent tests after preparation as shown in README. Some historical tests still require other generated research reports; the documented audit test set is the verified developer route, not a claim that every old script is a standalone supported test.
 
 To remove local game data, delete only the generated directories listed above. Preserve `docs/BUILD.md`, `docs/AUDIT.md` and `docs/audit_summary.json` if cleaning documentation outputs.
+
+## Experimental Android 5 build and launcher artwork
+
+Use the same SDK/NDK/JDK setup and prepared assets for both variants:
+
+```bash
+python3 tools/build_android_debug.py --legacy --sdk /absolute/path/to/android-sdk --jdk /absolute/path/to/jdk-17 --output dist/ProjectFarFarAway-Android5-experimental.apk
+```
+
+`--legacy` builds API21 ARMv7 + ARM64 with a separate app ID, API21-compatible file/audio/display paths, native library extraction and v1 signing for old Android installers. The main APK remains API26+ ARM64. The two apps keep separate ROM imports and saved data.
+
+Supply `--launcher-art /path/to/your-icon.png` to either build to use your own launcher PNG. The builder stages this in its private resource copy; it never adds the PNG to public source. Release APKs use the maintainer's previous artwork, while the source default is the original FF vector placeholder.
+
+Verify either APK with `tests/verify_android_apk.py`; pass `--legacy` for the experimental variant and the same `--launcher-art` file to verify the packaged icon pixels. ARM64 uses 16 KiB ELF alignment; the ARMv7 shared C++ runtime uses its supported 4 KiB alignment. ZIP alignment is 16 KiB for both.
+
+`tests/verify_unified_activity75.py --api 21 --jdk /path/to/jdk --rom /path/to/original.gba` exercises the actual Java/JNI engine with API21 UI/audio stubs, including ROM import, static music loading, menu, editor, control and pacing behavior. These are host tests, not Android device execution.

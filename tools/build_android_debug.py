@@ -15,7 +15,12 @@ def main():
     ap.add_argument('--jdk', type=Path, required=True)
     ap.add_argument('--output', type=Path, default=ROOT/'dist/ProjectFarFarAway-debug.apk')
     ap.add_argument('--keystore', type=Path, default=ROOT/'android/debug.keystore')
+    ap.add_argument('--legacy',action='store_true',help='Experimental Android 5.0+ package, ARMv7 and ARM64, separate app ID.')
+    ap.add_argument('--launcher-art',type=Path,help='Optional user-supplied PNG launcher artwork (not published in source).')
     a = ap.parse_args()
+    min_api=21 if a.legacy else 26
+    abis=['armeabi-v7a','arm64-v8a'] if a.legacy else ['arm64-v8a']
+    package='org.shrek2.research.legacy' if a.legacy else 'org.shrek2.research'
     from prepare_assets import verify_assets
     try: verify_assets()
     except RuntimeError as error: ap.error(str(error)+'\nRun: python3 tools/prepare_assets.py /path/to/original.gba')
@@ -33,41 +38,57 @@ def main():
         print('Running:', Path(str(args[0])).name, flush=True)
         return subprocess.run([str(x) for x in args], env=env, check=True,
                               capture_output=capture, text=True)
-    work = ROOT/'android/build/direct-debug'
+    work = ROOT/('android/build/direct-legacy' if a.legacy else 'android/build/direct-debug')
     work.mkdir(parents=True, exist_ok=True)
     for name in ['classes','dex']:
         p = work/name
         if p.exists(): shutil.rmtree(p)
         p.mkdir()
-    native = work/'native'
-    run(cmake, '-S', ROOT/'android/app/src/main/cpp', '-B', native,
-        f'-DCMAKE_TOOLCHAIN_FILE={ndk}/build/cmake/android.toolchain.cmake',
-        '-DANDROID_ABI=arm64-v8a', '-DANDROID_PLATFORM=android-26',
-        '-DANDROID_STL=c++_shared', '-DCMAKE_BUILD_TYPE=Release')
-    run(cmake, '--build', native, '-j', '4')
+    natives={}
+    for abi in abis:
+        native=work/('native-'+abi);natives[abi]=native
+        run(cmake, '-S', ROOT/'android/app/src/main/cpp', '-B', native,
+            f'-DCMAKE_TOOLCHAIN_FILE={ndk}/build/cmake/android.toolchain.cmake',
+            '-DANDROID_ABI='+abi, '-DANDROID_PLATFORM=android-'+str(min_api),
+            '-DANDROID_STL=c++_shared', '-DCMAKE_BUILD_TYPE=Release')
+        run(cmake, '--build', native, '-j', '4')
     sources = sorted((ROOT/'android/app/src/main/java').rglob('*.java'))
     run(jdk/'bin/javac', '--release', '17', '-encoding', 'UTF-8', '-classpath', platform,
         '-d', work/'classes', *sources)
     run(jdk/'bin/jar', '--create', '--file', work/'classes.jar', '-C', work/'classes', '.')
-    run(bt/'d8', '--lib', platform, '--min-api', '26', '--output', work/'dex', work/'classes.jar')
+    run(bt/'d8', '--lib', platform, '--min-api', str(min_api), '--output', work/'dex', work/'classes.jar')
     tree = ET.parse(ROOT/'android/app/src/main/AndroidManifest.xml')
     manifest = tree.getroot()
-    manifest.set('package', 'org.shrek2.research')
+    manifest.set('package', package)
+    for activity in manifest.findall('application/activity'):
+        name=activity.get(f'{{{ANDROID}}}name','')
+        if name.startswith('.'):activity.set(f'{{{ANDROID}}}name','org.shrek2.research'+name)
     app = manifest.find('application')
-    app.set(f'{{{ANDROID}}}extractNativeLibs', 'false')
+    app.set(f'{{{ANDROID}}}extractNativeLibs', 'true' if a.legacy else 'false')
+    if a.legacy:app.set(f'{{{ANDROID}}}label','Project Far Far Away (Android 5 experimental)')
+    resources=work/'res'
+    if resources.exists():shutil.rmtree(resources)
+    shutil.copytree(ROOT/'android/app/src/main/res',resources)
+    if a.launcher_art:
+        if not a.launcher_art.is_file():ap.error('Launcher PNG not found')
+        art=resources/'drawable-nodpi/launcher_art.png';art.parent.mkdir(exist_ok=True)
+        shutil.copyfile(a.launcher_art,art)
+        for attr in ['icon','roundIcon']:app.set(f'{{{ANDROID}}}'+attr,'@drawable/launcher_art')
     tree.write(work/'AndroidManifest.xml', encoding='utf-8', xml_declaration=True)
-    run(bt/'aapt2', 'compile', '--dir', ROOT/'android/app/src/main/res', '-o', work/'resources.zip')
+    run(bt/'aapt2', 'compile', '--dir', resources, '-o', work/'resources.zip')
     run(bt/'aapt2', 'link', '-o', work/'unsigned.apk', '--manifest', work/'AndroidManifest.xml',
-        '-I', platform, work/'resources.zip', '-A', ROOT/'android/app/src/main/assets', '--min-sdk-version', '26',
-        '--target-sdk-version', '35', '--version-code', '111',
-        '--version-name', '1.0.1', '--debug-mode', '-0', 'wav')
+        '-I', platform, work/'resources.zip', '-A', ROOT/'android/app/src/main/assets', '--min-sdk-version', str(min_api),
+        '--target-sdk-version', '35', '--version-code', '112',
+        '--version-name', '1.0.2-android5-experimental' if a.legacy else '1.0.2', '--debug-mode', '-0', 'wav')
     with zipfile.ZipFile(work/'unsigned.apk', 'a') as z:
         for dex in sorted((work/'dex').glob('*.dex')): z.write(dex, dex.name)
-        stripped=work/'stripped';stripped.mkdir(exist_ok=True)
-        for source in [native/'libshrek_scene.so',ndk/'toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so']:
-            copy=stripped/source.name;shutil.copy2(source,copy)
-            run(ndk/'toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip','--strip-unneeded',copy)
-            z.write(copy,'lib/arm64-v8a/'+source.name,compress_type=zipfile.ZIP_STORED)
+        for abi,native in natives.items():
+            triple='arm-linux-androideabi' if abi=='armeabi-v7a' else 'aarch64-linux-android'
+            stripped=work/'stripped'/abi;stripped.mkdir(parents=True,exist_ok=True)
+            for source in [native/'libshrek_scene.so',ndk/('toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/'+triple+'/libc++_shared.so')]:
+                copy=stripped/source.name;shutil.copy2(source,copy)
+                run(ndk/'toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip','--strip-unneeded',copy)
+                z.write(copy,'lib/'+abi+'/'+source.name,compress_type=zipfile.ZIP_STORED)
     optimization=compress_music(work/'unsigned.apk')
     run(bt/'zipalign', '-f', '-P', '16', '4', work/'unsigned.apk', work/'aligned.apk')
     a.keystore.parent.mkdir(parents=True, exist_ok=True)
@@ -93,12 +114,12 @@ def main():
                 asset_count += 1
     staged.replace(output)
     report = {'apk': output.name, 'size': output.stat().st_size,
-              'sha256': hashlib.sha256(output.read_bytes()).hexdigest(), 'abi': 'arm64-v8a',
-              'min_sdk': 26, 'target_sdk': 35, 'version_code': 111,
+              'sha256': hashlib.sha256(output.read_bytes()).hexdigest(), 'abis': abis,
+              'min_sdk': min_api, 'target_sdk': 35, 'version_code': 112,
               'java_sources_compiled': len(sources), 'assets_verified': asset_count,
               'signature_verification': signature.strip(), 'zip_alignment_kib': 16,
               'build_route': 'JDK17 + SDK35 aapt2/d8/zipalign/apksigner + CMake3.22.1/NDK28',
-              'device_tested': False, 'payload_optimization':optimization, 'scope': 'Stage111/v1.0.1: held spring bounce, all physical items on dynamic floors, grounded editor hero replacement, correct pickup names; original invisibility damage rules verified. Includes previous fixes and high-refresh support. Lossless smaller APK; exact ROM gate retained. Host and Java/JNI verification; physical Android not tested.'}
+              'device_tested': False, 'payload_optimization':optimization, 'scope': 'Stage112/v1.0.2: bounded 2-2/final boss camera, instant editor hero relocation, optional original launcher art, separate experimental API21 dual-ABI build. Includes previous fixes and high-refresh support. Lossless smaller APK; exact ROM gate retained. Host and Java/JNI verification; physical Android not tested.'}
     (ROOT/'docs/android_build_validation.json').write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps(report, indent=2))
 

@@ -15,10 +15,10 @@ final class MusicPcm {
  private static Wave read(InputStream in,boolean allowEmpty)throws IOException {
   ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] block=new byte[8192];int n;
   while((n=in.read(block))!=-1){if(n==0)continue;if(out.size()+n>16*1024*1024)throw new IOException("Could not load or update resources");out.write(block,0,n);}
-  byte[] b=out.toByteArray();if(b.length<12||!tag(b,0,"RIFF")||!tag(b,8,"WAVE")||Integer.toUnsignedLong(word(b,4))+8!=b.length)throw new IOException("Could not load or update resources");
+  byte[] b=out.toByteArray();if(b.length<12||!tag(b,0,"RIFF")||!tag(b,8,"WAVE")||(word(b,4)&0xffffffffL)+8!=b.length)throw new IOException("Could not load or update resources");
   Wave w=new Wave();boolean format=false;
   for(int p=12;p<b.length;){
-   if(b.length-p<8)throw new IOException("Could not load or update resources");long size=Integer.toUnsignedLong(word(b,p+4));long end=p+8L+size;if(end>b.length)throw new IOException("Could not load or update resources");
+   if(b.length-p<8)throw new IOException("Could not load or update resources");long size=(word(b,p+4)&0xffffffffL);long end=p+8L+size;if(end>b.length)throw new IOException("Could not load or update resources");
    if(tag(b,p,"fmt ")){if(size<16||word(b,p+8)!=0x00010001||word(b,p+20)!=0x00100002)throw new IOException("Could not load or update resources");w.rate=word(b,p+12);if(w.rate<8000||w.rate>48000||word(b,p+16)!=w.rate*2)throw new IOException("Could not load or update resources");format=true;}
    if(tag(b,p,"data")){if(w.data!=null||(!allowEmpty&&size==0)||(size&1)!=0)throw new IOException("Could not load or update resources");w.data=new byte[(int)size];System.arraycopy(b,p+8,w.data,0,(int)size);}
    long next=end+(size&1);if(next>b.length)throw new IOException("Could not load or update resources");p=(int)next;

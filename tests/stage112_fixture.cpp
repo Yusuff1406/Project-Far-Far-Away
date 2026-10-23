@@ -1,0 +1,7 @@
+#define main stage93main
+#include "stage93_session_fixture.cpp"
+#undef main
+int main(){std::cout.setf(std::ios::unitbuf);
+ for(int scene:{14,16})for(int width:{240,320}){auto*s=create(scene);s->width=width;int expected=scene==14?4992-width:width==240?64:0;std::cerr<<scene<<" width "<<width<<" world "<<s->worldWidth<<" right "<<cameraRight(*s)<<" expected "<<expected<<"\n";assert(cameraRight(*s)<=expected);qPlace(s->state,s->worldWidth-1,180);s->jointControl=false;cameraFocusTarget(*s,s->cameraFocus);projectPartyCamera(*s);assert(s->cameraX<=expected);std::vector<uint32_t> pixels(width*160);assert(!render(*s,pixels.data()));s2_session_destroy(s);}std::cout<<"PASS finite art bounds in chapter2-2 and final boss\n";
+ for(int scene:{0,2,4,14})for(int cmd:{0,10}){auto*s=create(scene);quiet(*s);s->cameraX=0;s->cameraY=0;s->cameraFocus[0]=0;s->cameraFocus[1]=0;s->cameraReady=s->historyReady=s->displayCaptured=true;s->effects[4]=2;s->jointControl=false;int x=s->worldWidth-100,y=200;assert(!(cmd==0?s2_session_debug_edit(s,0,x,y,0):s2_session_debug_edit(s,10,s->partyIndex,x,y)));int32_t target[2];cameraFocusTarget(*s,target);assert(s->cameraFocus[0]==target[0]&&s->cameraFocus[1]==target[1]);assert(!s->cameraBlend&&!s->cameraReady&&!s->historyReady&&!s->displayCaptured);assert(s->cameraX>0&&s->lastRenderX==s->cameraX);for(auto v:s->effects)assert(!v);s2_session_destroy(s);}std::cout<<"PASS editor relocations snap focus/effects/presentation in single and party scenes\n";
+}

@@ -1,7 +1,7 @@
 package org.shrek2.research;
 
 import java.io.*;
-import java.nio.file.*;
+
 import java.security.*;
 
 /** Exact original resource source; never trust a filename or a saved boolean. */
@@ -28,7 +28,7 @@ final class RomStore {
   try {
    String actual;try(FileOutputStream out=new FileOutputStream(temp)){actual=digest(in,out);out.getFD().sync();}
    if(!SHA256.equals(actual))throw new IOException("ROM hash does not match. Use the unmodified "+TITLE+" release.\nSelected SHA-256: "+actual);
-   try{Files.move(temp.toPath(),destination.toPath(),StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);}catch(AtomicMoveNotSupportedException e){Files.move(temp.toPath(),destination.toPath(),StandardCopyOption.REPLACE_EXISTING);}
-  }finally{Files.deleteIfExists(temp.toPath());}
+   if(!temp.renameTo(destination))throw new IOException("Could not install the validated ROM.");
+  }finally{if(temp.exists())temp.delete();}
  }
 }
